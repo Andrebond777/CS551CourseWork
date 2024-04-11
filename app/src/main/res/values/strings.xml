@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CourseWork</string>
+    <string name="add_name">Add Name</string>
+    <string name="enter_height">Height (cm)</string>
+    <string name="enter_parameters">Enter Parameters</string>
+    <string name="enter_weight">Weight (kg)</string>
+    <string name="enter_age">Enter Age</string>
+    <string name="save">Save\n</string>
+    <string name="main_screen">Main</string>
+    <string name="enter_data_screen">Enter Data</string>
+    <string name="back_button">Back</string>
+    <string name="main_screen2">Main Screen 2</string>
+    <string name="some_screen">Some Screen</string>
+    <string name="tips_screen">Tips</string>
+</resources>
