@@ -46,18 +46,26 @@ import com.example.coursework.AppScreen
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
+import com.example.healthapproomdb.model.StepsData
+import kotlinx.coroutines.Dispatchers
+import java.util.Calendar
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
-    viewModel: AppViewModel = viewModel(),
+    viewModel: AppViewModel,
     modifier: Modifier = Modifier,
     navHostController: NavHostController
 )
 {
     val uiState by viewModel.uiState.collectAsState()
     val dailyKCalProgress = uiState.dayKCal.toFloat() / uiState.dailyKCalIntake.toFloat()
+
+    // steps today
+    val stepsToday by viewModel.stepsToday.collectAsState()
+    // steps week
+    val stepsWeek by viewModel.stepsWeek.collectAsState()
 
     // Weather Data
     val weatherState by viewModel.weatherState.collectAsState()
@@ -84,12 +92,14 @@ fun MainScreen(
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
-                .padding(20.dp, 10.dp).fillMaxWidth().height(60.dp)
+                .padding(20.dp, 10.dp)
+                .fillMaxWidth()
+                .height(60.dp)
                 .align(alignment = Alignment.Start))
         {
 
             Text(
-                text = "Tips and tricks",
+                text = "Today's Steps: ${stepsToday ?: "Loading..."}",
                 color = colorResource(R.color.white),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
@@ -142,15 +152,42 @@ fun MainScreen(
                 .clip(RoundedCornerShape(20))
                 .background(colorResource(id = R.color.blue))
                 .combinedClickable(
-                    onLongClick = {
+                    onClick = {
+//                        mock data
+//                        var sdk = StepsData(stepCount = 10)
+//                        viewModel.addSteps(sdk)
+
+
+
                         notificationWorker.triggerNotification(
                             context,
-                            "Testing Notification123",
-                            "Its working now"
+                            "Week",
+                            "$stepsWeek",
                         )
                     },
-                    onClick = {
-                        // do ntg
+                    onLongClick = {
+                        // long click for now time
+                        var sdk = StepsData(stepCount = 10)
+                        viewModel.addSteps(sdk)
+                        var sdko = StepsData(stepCount = 5)
+                        viewModel.addSteps(sdko)
+
+                        // old data
+                        val currentDateAndTime = System.currentTimeMillis()
+                        val mockDataWithPreviousDate = StepsData(stepCount = 200, previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)) // Uses previous date
+
+                        viewModel.addSteps(mockDataWithPreviousDate)
+
+                        // expected behaviour is
+                        // today = 15
+                        // week = 215
+
+
+//                        notificationWorker.triggerNotification(
+//                            context,
+//                            "Week",
+//                            "$stepsWeek",
+//                        )
                     }
                 )
         ) {
@@ -277,7 +314,9 @@ fun MainScreen(
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
-                .padding(22.dp).fillMaxWidth().height(60.dp)
+                .padding(22.dp)
+                .fillMaxWidth()
+                .height(60.dp)
                 .align(alignment = Alignment.CenterHorizontally))
 
         {
@@ -305,7 +344,8 @@ fun MainPreview() {
         MainScreen(
             modifier = Modifier
                 .fillMaxSize(),
-            navHostController = rememberNavController()
+            navHostController = rememberNavController(),
+            viewModel = viewModel()
         )
     }
 }

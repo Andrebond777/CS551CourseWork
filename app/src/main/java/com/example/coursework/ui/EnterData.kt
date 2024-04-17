@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,12 +35,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
+import com.example.healthapproomdb.model.UserData
 
 @Composable
-fun EnterDataScreen(navHostController: NavHostController) {
-    var height by rememberSaveable { mutableStateOf("") }
-    var weight by rememberSaveable { mutableStateOf("") }
-    var age by rememberSaveable { mutableStateOf("") }
+fun EnterDataScreen(navHostController: NavHostController, viewModel: AppViewModel) {
+
+    val (height, setHeight) = remember { mutableStateOf("") }
+    val (weight, setWeight) = remember { mutableStateOf("") }
+    val (age, setAge) = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -62,7 +65,7 @@ fun EnterDataScreen(navHostController: NavHostController) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = height,
-            onValueChange = { height = it },
+            onValueChange = setHeight,
             placeholder = { Text(text = "e.g. 180") },
             isError = height.isNotEmpty() && !isValidText(height)
         )
@@ -74,7 +77,7 @@ fun EnterDataScreen(navHostController: NavHostController) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = weight,
-            onValueChange = { weight = it },
+            onValueChange = setWeight,
             placeholder = { Text(text = "e.g. 75") },
             isError = weight.isNotEmpty() && !isValidText(weight)
         )
@@ -86,7 +89,7 @@ fun EnterDataScreen(navHostController: NavHostController) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = age,
-            onValueChange = { age = it },
+            onValueChange = setAge,
             placeholder = { Text(text = "e.g. 30") },
             isError = age.isNotEmpty() && !isValidText(age)
         )
@@ -104,7 +107,11 @@ fun EnterDataScreen(navHostController: NavHostController) {
                 .height(55.dp)
                 .align(Alignment.CenterHorizontally),
             onClick = {
-
+                var newData = UserData(height = height, weight = weight, age = age)
+                viewModel.insertUserData(newData)
+                setHeight("")
+                setWeight("")
+                setAge("")
             },colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = MaterialTheme.shapes.extraLarge
         ) {
@@ -132,7 +139,8 @@ fun isValidText(text: String): Boolean {
 fun EnterDataPreview() {
     CourseWorkTheme {
         EnterDataScreen(
-            navHostController = rememberNavController()
+            navHostController = rememberNavController(),
+            viewModel = viewModel()
         )
     }
 }

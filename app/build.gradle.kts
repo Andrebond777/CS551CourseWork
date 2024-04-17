@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+
 }
 
 android {
@@ -76,6 +78,13 @@ dependencies {
 
     // For Notification
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+    // room database
+    implementation("androidx.room:room-ktx:2.6.1")
+    testImplementation("org.testng:testng:6.9.6")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

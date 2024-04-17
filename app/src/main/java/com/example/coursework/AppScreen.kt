@@ -70,7 +70,7 @@ fun MainScreenBar(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppScreen(
-    viewModel: AppViewModel = viewModel(),
+    viewModel: AppViewModel,
     navController: NavHostController = rememberNavController())
 {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -105,7 +105,8 @@ fun AppScreen(
             }
             composable(route = AppScreen.EnterData.name) {
                 EnterDataScreen(
-                    navController
+                    navController,
+                    viewModel
                 )
             }
             composable(route = AppScreen.Tips.name) {
