@@ -115,14 +115,14 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-    private fun getStepsToday() {
+    fun getStepsToday() {
         viewModelScope.launch(Dispatchers.IO) {
             val stepsToday = repository.getStepsToday(todayStart)
             _stepsToday.value = stepsToday
         }
     }
 
-    private fun getStepsLastSevenDays() {
+    fun getStepsLastSevenDays() {
         viewModelScope.launch(Dispatchers.IO) {
             val stepsWeek = repository.getStepsLastSevenDays(sevenDaysAgo, todayEnd)
             _stepsWeek.value = stepsWeek

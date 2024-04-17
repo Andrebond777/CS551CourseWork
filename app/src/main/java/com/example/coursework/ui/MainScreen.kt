@@ -26,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +68,7 @@ fun MainScreen(
     val stepsToday by viewModel.stepsToday.collectAsState()
     // steps week
     val stepsWeek by viewModel.stepsWeek.collectAsState()
+    val key = remember { mutableStateOf(0) }
 
     // Weather Data
     val weatherState by viewModel.weatherState.collectAsState()
@@ -80,6 +83,11 @@ fun MainScreen(
     // When apps run, will enable the notification channel first
     LaunchedEffect(Unit) {
         notificationWorker.createNotificationChannel("ChannelID", context)
+    }
+
+    LaunchedEffect(key.value) {
+        viewModel.getStepsLastSevenDays()
+        viewModel.getStepsToday()
     }
 
     Column(
@@ -99,7 +107,7 @@ fun MainScreen(
         {
 
             Text(
-                text = "Today's Steps: ${stepsToday ?: "Loading..."}",
+                text = stepsToday.toString(),
                 color = colorResource(R.color.white),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
@@ -157,8 +165,6 @@ fun MainScreen(
 //                        var sdk = StepsData(stepCount = 10)
 //                        viewModel.addSteps(sdk)
 
-
-
                         notificationWorker.triggerNotification(
                             context,
                             "Week",
@@ -166,11 +172,18 @@ fun MainScreen(
                         )
                     },
                     onLongClick = {
+
+                        // note every time you add a new step data
+                        // add this at last key.value++
                         // long click for now time
                         var sdk = StepsData(stepCount = 10)
                         viewModel.addSteps(sdk)
+                        key.value++
+
                         var sdko = StepsData(stepCount = 5)
                         viewModel.addSteps(sdko)
+                        key.value++
+
 
                         // old data
                         val currentDateAndTime = System.currentTimeMillis()
