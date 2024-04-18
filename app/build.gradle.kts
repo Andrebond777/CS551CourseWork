@@ -84,6 +84,12 @@ dependencies {
     testImplementation("org.testng:testng:6.9.6")
     kapt("androidx.room:room-compiler:2.6.1")
 
+    //location services
+    implementation("com.google.android.gms:play-services-location:17.0.0")
+
+    //work manager
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+
 
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))

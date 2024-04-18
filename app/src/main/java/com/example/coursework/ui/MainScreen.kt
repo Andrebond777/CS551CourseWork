@@ -90,6 +90,14 @@ fun MainScreen(
         viewModel.getStepsToday()
     }
 
+    //GPS TESTING
+    //Uncomment to get a notification containing latitude and longitude when opening application
+    /*
+    var location= viewModel.location.collectAsState(initial = DoubleArray(2))
+    val notificationString =  location.value[0].toString() + " " + location.value[1].toString()
+    notificationWorker.triggerNotification(context, "GPS TEST", notificationString)
+    */
+
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier

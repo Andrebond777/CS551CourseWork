@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -36,6 +37,13 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
     // steps params for last 7 days
     private val _stepsWeek = MutableStateFlow<Int?>(0)
     val stepsWeek: StateFlow<Int?> = _stepsWeek
+
+    //variable that fetches the output of the gps worker from the repository
+    val location: Flow<DoubleArray> = repository.outputWorkInfo
+        .map { info ->
+            info.outputData.getDoubleArray("GPS") ?: DoubleArray(2)
+        }
+
 
     init {
         // Trigger getStepsToday() and seven days when ViewModel is initialized
@@ -138,4 +146,8 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
 
     // room database function ends here -------->
 
+    //Use to Run GPS worker to fetch GPS location into
+    fun getGPSLocation(){
+        repository.getGPSLocation()
+    }
 }
