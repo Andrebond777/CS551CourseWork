@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,9 +52,11 @@ fun TipsScreen(navHostController: NavHostController)
 {
     Column(
         modifier = Modifier
-            .padding(16.dp, 16.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+            .padding(5.dp, 0.dp),
+        verticalArrangement = Arrangement.spacedBy(-10.dp)
     ) {
+
+        Spacer(modifier = Modifier.padding(20.dp))
 
         Box(
             modifier = Modifier
@@ -85,6 +88,8 @@ fun TipsScreen(navHostController: NavHostController)
             }
         }
 
+        Spacer(modifier = Modifier.padding(15.dp))
+
         Box(
             modifier = Modifier
                 .align(Alignment.Start)
@@ -97,12 +102,12 @@ fun TipsScreen(navHostController: NavHostController)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp, 10.dp),
+                    .padding(30.dp, 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Column {
-                    Box(Modifier.clip(RoundedCornerShape(100)).background(colorResource(id = R.color.green)).padding(12.dp, 8.dp)
+                    Box(Modifier.clip(RoundedCornerShape(100)).background(colorResource(id = R.color.green)).padding(10.dp, 0.dp)
                         )
                     {
                         Text(
@@ -115,7 +120,7 @@ fun TipsScreen(navHostController: NavHostController)
 
                     LazyColumn {
                         items(doTips) {
-                            Row (modifier = Modifier.padding(0.dp, 5.dp))
+                            Row (modifier = Modifier.padding(0.dp, 10.dp))
                             {
 
                                 Icon(
@@ -146,12 +151,12 @@ fun TipsScreen(navHostController: NavHostController)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp, 10.dp),
+                    .padding(30.dp, 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Column {
-                    Box(Modifier.clip(RoundedCornerShape(100)).background(Color.Red).padding(18.dp, 8.dp)
+                    Box(Modifier.clip(RoundedCornerShape(100)).background(Color.Red).padding(12.dp, 0.dp)
                     )
                     {
                         Text(
@@ -164,7 +169,7 @@ fun TipsScreen(navHostController: NavHostController)
 
                     LazyColumn {
                         items(doNotTips) {
-                            Row (modifier = Modifier.padding(0.dp, 5.dp))
+                            Row (modifier = Modifier.padding(0.dp, 10.dp))
                             {
 
                                 Icon(

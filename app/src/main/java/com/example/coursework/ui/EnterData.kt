@@ -1,5 +1,5 @@
 package com.example.coursework.ui
-
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.coursework.MainActivity
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.healthapproomdb.model.UserData
+import com.example.healthapproomdb.repository.UserRepository
 
 @Composable
 fun EnterDataScreen(navHostController: NavHostController, viewModel: AppViewModel) {
@@ -140,7 +142,7 @@ fun EnterDataPreview() {
     CourseWorkTheme {
         EnterDataScreen(
             navHostController = rememberNavController(),
-            viewModel = viewModel()
+            viewModel = AppViewModel(repository = UserRepository(MainActivity()))
         )
     }
 }
