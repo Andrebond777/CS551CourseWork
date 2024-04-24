@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -49,8 +50,8 @@ import com.example.coursework.MainActivity
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
-import com.example.healthapproomdb.model.StepsData
-import com.example.healthapproomdb.repository.UserRepository
+import com.example.coursework.model.StepsData
+import com.example.coursework.repository.UserRepository
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 
@@ -65,11 +66,14 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dailyKCalProgress = uiState.dayKCal.toFloat() / uiState.dailyKCalIntake.toFloat()
 
+    val recommendedSteps by viewModel.recommendedSteps.collectAsState()
     // steps today
     val stepsToday by viewModel.stepsToday.collectAsState()
     // steps week
     val stepsWeek by viewModel.stepsWeek.collectAsState()
     val key = remember { mutableStateOf(0) }
+
+    val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
 
     // Weather Data
     val weatherState by viewModel.weatherState.collectAsState()
@@ -105,38 +109,40 @@ fun MainScreen(
         modifier = modifier
     ) {
 
-        Box(
+        Button(onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
+            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            shape = RoundedCornerShape(20),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
-                .clip(RoundedCornerShape(20))
-                .background(colorResource(id = R.color.blue))
-        ) {
+                .align(alignment = Alignment.Start))
+
+        {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
                 Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(75.dp),
-                        color = Color.LightGray,
-                        progress = dailyKCalProgress,
-                        strokeWidth = 8.dp,
-                    )
-
-                    Text(
-                        text = "" + (dailyKCalProgress*100).toInt() +"%",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 25.sp
-                    )
+                    if (dailyStepsProgress != null) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(75.dp),
+                            color = Color.White,
+                            progress = dailyStepsProgress,
+                            strokeWidth = 8.dp
+                        )
+                    }
+                    if (dailyStepsProgress != null) {
+                        Text(
+                            text = "" + (dailyStepsProgress*100).toInt() +"%",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 25.sp
+                        )
+                    }
                 }
 
-                Column {
+                Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                     Text(
                         text = "Great!",
                         color = Color.White,
@@ -144,15 +150,15 @@ fun MainScreen(
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "You've lost "+ (dailyKCalProgress*100).toInt()+ "% of your \ndaily calorie intake",
+                        text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
                 }
 
             }
-        }
 
+        }
 
         //Spacer(modifier = Modifier.size(7.dp))
 
@@ -180,7 +186,7 @@ fun MainScreen(
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "You are walking this week " + viewModel.stepsWeek.value,
+                        text = "You are walking this week ",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
@@ -385,7 +391,7 @@ fun MainPreview() {
             modifier = Modifier
                 .fillMaxSize(),
             navHostController = rememberNavController(),
-            viewModel = AppViewModel(repository = UserRepository(MainActivity()))
+            viewModel = viewModel()
         )
     }
 }
