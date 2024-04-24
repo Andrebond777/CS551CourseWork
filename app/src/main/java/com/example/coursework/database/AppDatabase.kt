@@ -5,11 +5,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
+import com.example.coursework.model.WaterData
 
-@Database(entities = [UserData::class, StepsData::class], version = 1)
+@Database(entities = [UserData::class, StepsData::class, WaterData::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDataDao
     abstract fun stepDao(): StepDataDao
+
+    abstract fun waterDao(): WaterDataDao
 
 
     companion object {

@@ -44,6 +44,10 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     val stepsToday: StateFlow<Int?> = _stepsToday
     private val _stepsWeek = MutableStateFlow<Int?>(0)
     val stepsWeek: StateFlow<Int?> = _stepsWeek
+
+    private val _waterGiven = MutableStateFlow<Int?>(0)
+    val waterGiven: StateFlow<Int?> = _waterGiven
+
     //variable that fetches the output of the gps worker from the repository
     val location: Flow<DoubleArray> = repository.outputWorkInfo
         .map { info ->
@@ -182,8 +186,25 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         }
     }
 
+    // return last same date value
+    // -1 if no value of same date exists
+    fun getLastWaterDataSameDate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val waterGiven = repository.getLastWaterDataSameDate()
+            _waterGiven.value = waterGiven
+        }
+    }
 
-
+    // check if same date value exists
+    // if not
+    // create a row with value set to 1
+    fun setLastWaterDataToOne() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.setLastWaterDataToOne()
+            val waterGiven = repository.getLastWaterDataSameDate()
+            _waterGiven.value = waterGiven
+        }
+    }
 
     fun addSteps(step: StepsData) {
         viewModelScope.launch {
