@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,20 +38,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coursework.AppScreen
-import com.example.coursework.MainActivity
 import com.example.coursework.R
+import com.example.coursework.model.StepsData
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
-import com.example.healthapproomdb.model.StepsData
-import com.example.healthapproomdb.repository.UserRepository
-import kotlinx.coroutines.Dispatchers
-import java.util.Calendar
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -105,6 +100,25 @@ fun MainScreen(
         modifier = modifier
     ) {
 
+        Button(
+            onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
+            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            shape = RoundedCornerShape(20),
+            modifier = Modifier
+                .padding(20.dp, 10.dp)
+                .fillMaxWidth()
+                .height(60.dp)
+                .align(alignment = Alignment.Start))
+        {
+
+            Text(
+                text = "Steps",
+                color = colorResource(R.color.white),
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+        }
+
 
 
         Box(
@@ -114,63 +128,11 @@ fun MainScreen(
                 .clip(RoundedCornerShape(20))
                 .background(colorResource(id = R.color.blue))
         ) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(75.dp),
-                        color = Color.LightGray,
-                        progress = dailyKCalProgress,
-                        strokeWidth = 8.dp,
-                    )
-
-                    Text(
-                        text = "" + (dailyKCalProgress*100).toInt() +"%",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 25.sp
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = "Great!",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "You've lost "+ (dailyKCalProgress*100).toInt()+ "% of your \ndaily calorie intake",
-                        color = Color.LightGray,
-                        fontSize = 16.sp
-                    )
-                }
-
-
-            }
-        }
-
-
-        //Spacer(modifier = Modifier.size(7.dp))
-
-
-        Button(onClick = { navHostController.navigate(AppScreen.Highlights.name) },
-            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
-            shape = RoundedCornerShape(20),
-            modifier = Modifier
-                .padding(20.dp, 10.dp).fillMaxWidth()
-                .align(alignment = Alignment.Start))
-
-        {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -182,16 +144,18 @@ fun MainScreen(
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "You are walking this week " + viewModel.stepsWeek.value,
+                        text = "On average you're walking less this year compared to last year.",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
+
 
                 }
             }
 
         }
 
+        // Spacer(modifier = Modifier.size(230.dp))
 
         // Bryant - Start of weather box
         Box(
@@ -314,37 +278,53 @@ fun MainScreen(
 
         } // end of weather box
 
-
-        Button(onClick = { navHostController.navigate(AppScreen.Tips.name) },
-            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
-            shape = RoundedCornerShape(20),
+        Box(
             modifier = Modifier
-                .padding(20.dp, 10.dp).fillMaxWidth()
-                .align(alignment = Alignment.Start))
-
-        {
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .clip(RoundedCornerShape(20))
+                .background(colorResource(id = R.color.blue))
+        ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(75.dp),
+                        color = Color.LightGray,
+                        progress = dailyKCalProgress,
+                        strokeWidth = 8.dp,
+                    )
+
+                    Text(
+                        text = "" + (dailyKCalProgress*100).toInt() +"%",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp
+                    )
+                }
+
                 Column {
                     Text(
-                        text = "Tips and tricks",
+                        text = "Great!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "Get an additional advice on losing weight.",
+                        text = "You've lost "+ (dailyKCalProgress*100).toInt()+ "% of your \ndaily calorie intake",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
-
                 }
-            }
 
+
+            }
         }
 
 
@@ -354,6 +334,7 @@ fun MainScreen(
             modifier = Modifier
                 .padding(22.dp)
                 .fillMaxWidth()
+                .height(60.dp)
                 .align(alignment = Alignment.CenterHorizontally))
 
         {
@@ -382,7 +363,7 @@ fun MainPreview() {
             modifier = Modifier
                 .fillMaxSize(),
             navHostController = rememberNavController(),
-            viewModel = AppViewModel(repository = UserRepository(MainActivity()))
+            viewModel = viewModel()
         )
     }
 }

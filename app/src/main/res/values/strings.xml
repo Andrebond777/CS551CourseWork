@@ -13,4 +13,7 @@
     <string name="some_screen">Some Screen</string>
     <string name="tips_screen">Tips</string>
     <string name="highlights_screen">Highlights</string>
+    <string name="channel_name">Step Counter Notification Channel</string>
+    <string name="channel_description">Notifications for step count progress and milestones</string>
+    <string name="steps_progress_screen">Steps</string>
 </resources>
