@@ -1,5 +1,6 @@
 package com.example.coursework.ui
 
+import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -51,8 +51,7 @@ import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
 import com.example.healthapproomdb.model.StepsData
 import com.example.healthapproomdb.repository.UserRepository
-import kotlinx.coroutines.Dispatchers
-import java.util.Calendar
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,6 +77,7 @@ fun MainScreen(
 
     // Local Context
     val context = LocalContext.current
+    val activity = LocalContext.current as Activity
 
     // Call notification function from NotificationWorker
     val notificationWorker = NotificationWorker()
@@ -97,15 +97,13 @@ fun MainScreen(
     /*
     var location= viewModel.location.collectAsState(initial = DoubleArray(2))
     val notificationString =  location.value[0].toString() + " " + location.value[1].toString()
-    notificationWorker.triggerNotification(context, "GPS TEST", notificationString)
+    notificationWorker.triggerNotification(activity, context, "GPS TEST", notificationString)
     */
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
     ) {
-
-
 
         Box(
             modifier = Modifier
@@ -152,7 +150,6 @@ fun MainScreen(
                     )
                 }
 
-
             }
         }
 
@@ -164,7 +161,8 @@ fun MainScreen(
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
-                .padding(20.dp, 10.dp).fillMaxWidth()
+                .padding(20.dp, 10.dp)
+                .fillMaxWidth()
                 .align(alignment = Alignment.Start))
 
         {
@@ -207,6 +205,7 @@ fun MainScreen(
 //                        viewModel.addSteps(sdk)
 
                         notificationWorker.triggerNotification(
+                            activity,
                             context,
                             "Week",
                             "$stepsWeek",
@@ -228,7 +227,10 @@ fun MainScreen(
 
                         // old data
                         val currentDateAndTime = System.currentTimeMillis()
-                        val mockDataWithPreviousDate = StepsData(stepCount = 200, previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)) // Uses previous date
+                        val mockDataWithPreviousDate = StepsData(
+                            stepCount = 200,
+                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
+                        ) // Uses previous date
 
                         viewModel.addSteps(mockDataWithPreviousDate)
 
@@ -319,7 +321,8 @@ fun MainScreen(
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
-                .padding(20.dp, 10.dp).fillMaxWidth()
+                .padding(20.dp, 10.dp)
+                .fillMaxWidth()
                 .align(alignment = Alignment.Start))
 
         {
