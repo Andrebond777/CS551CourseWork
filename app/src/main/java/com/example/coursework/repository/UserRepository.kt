@@ -1,6 +1,7 @@
 package com.example.coursework.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -12,8 +13,10 @@ import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.worker.GPSWorker
 import com.example.coursework.worker.StepWorker
+import com.example.coursework.worker.WeatherWatcherWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 const val OUTPUT_TAG = "OUTPUT"
@@ -75,9 +78,29 @@ class UserRepository(context: Context) {
     }
 
     //Runs the GPS Worker
-    fun getGPSLocation() {
+    fun runGPSWorker() {
         val gpsBuilder = OneTimeWorkRequestBuilder<GPSWorker>()
             .addTag(OUTPUT_TAG)
+
+        // Start the work
+        workManager.enqueue(gpsBuilder.build())
+    }
+
+    fun runWeatherWatcherWorker(){
+        val currentTime = Calendar.getInstance().timeInMillis % 86400000
+        val delay = ((86400000 - currentTime) + 28800000)
+        //Log.d("TESTING1", currentTime.toString())
+        //Log.d("TESTING2", delay.toString())
+
+        val weatherWatcherBuilder = PeriodicWorkRequestBuilder<StepWorker>(24, TimeUnit.HOURS)
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork("StepTracking", ExistingPeriodicWorkPolicy.KEEP, weatherWatcherBuilder)
+    }
+
+    fun testWeatherWatcherWorker() {
+        val gpsBuilder = OneTimeWorkRequestBuilder<WeatherWatcherWorker>()
 
         // Start the work
         workManager.enqueue(gpsBuilder.build())

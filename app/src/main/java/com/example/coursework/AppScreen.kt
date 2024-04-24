@@ -1,5 +1,6 @@
 package com.example.coursework
 import android.annotation.SuppressLint
+import android.text.Highlights
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coursework.ui.AppViewModel
 import com.example.coursework.ui.EnterDataScreen
+import com.example.coursework.ui.HighlightsScreen
 import com.example.coursework.ui.MainScreen
 import com.example.coursework.ui.StepsProgressScreen
 import com.example.coursework.ui.TipsScreen
@@ -35,7 +37,8 @@ enum class AppScreen(@StringRes val title: Int) {
     Main(title = R.string.main_screen),
     EnterData(title = R.string.enter_data_screen),
     Tips(title = R.string.tips_screen),
-    StepsProgress(title = R.string.steps_progress_screen)
+    StepsProgress(title = R.string.steps_progress_screen),
+    Highlights(title = R.string.highlights_screen)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,6 +112,11 @@ fun AppScreen(
             }
             composable(route = AppScreen.Tips.name) {
                 TipsScreen(
+                    navController
+                )
+            }
+            composable(route = AppScreen.Highlights.name) {
+                HighlightsScreen(
                     navController
                 )
             }

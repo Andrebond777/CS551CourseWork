@@ -1,5 +1,6 @@
 package com.example.coursework.ui
 
+import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,16 +40,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coursework.AppScreen
+import com.example.coursework.MainActivity
 import com.example.coursework.R
-import com.example.coursework.model.StepsData
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
+import com.example.coursework.model.StepsData
+import com.example.coursework.repository.UserRepository
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -61,11 +66,14 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dailyKCalProgress = uiState.dayKCal.toFloat() / uiState.dailyKCalIntake.toFloat()
 
+    val recommendedSteps by viewModel.recommendedSteps.collectAsState()
     // steps today
     val stepsToday by viewModel.stepsToday.collectAsState()
     // steps week
     val stepsWeek by viewModel.stepsWeek.collectAsState()
     val key = remember { mutableStateOf(0) }
+
+    val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
 
     // Weather Data
     val weatherState by viewModel.weatherState.collectAsState()
@@ -73,6 +81,7 @@ fun MainScreen(
 
     // Local Context
     val context = LocalContext.current
+    val activity = LocalContext.current as Activity
 
     // Call notification function from NotificationWorker
     val notificationWorker = NotificationWorker()
@@ -89,50 +98,89 @@ fun MainScreen(
 
     //GPS TESTING
     //Uncomment to get a notification containing latitude and longitude when opening application
+
     /*
     var location= viewModel.location.collectAsState(initial = DoubleArray(2))
     val notificationString =  location.value[0].toString() + " " + location.value[1].toString()
-    notificationWorker.triggerNotification(context, "GPS TEST", notificationString)
+    notificationWorker.triggerNotification(activity, context, "GPS TEST", notificationString)
     */
+
+    //Runs the Weather Watcher worker for testing purposes
+    //viewModel.testWeatherWatcherWorker()
+
+    viewModel.runWeatherWatcherWorker()
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
     ) {
 
-        Button(
-            onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
+        Button(onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
+            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            shape = RoundedCornerShape(20),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .align(alignment = Alignment.Start))
+
+        {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Box(contentAlignment = Alignment.Center) {
+                    if (dailyStepsProgress != null) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(75.dp),
+                            color = Color.White,
+                            progress = dailyStepsProgress,
+                            strokeWidth = 8.dp
+                        )
+                    }
+                    if (dailyStepsProgress != null) {
+                        Text(
+                            text = "" + (dailyStepsProgress*100).toInt() +"%",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 25.sp
+                        )
+                    }
+                }
+
+                Column (modifier = Modifier.padding(horizontal = 15.dp)) {
+                    Text(
+                        text = "Great!",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
+                        color = Color.LightGray,
+                        fontSize = 16.sp
+                    )
+                }
+
+            }
+
+        }
+
+        //Spacer(modifier = Modifier.size(7.dp))
+
+
+        Button(onClick = { navHostController.navigate(AppScreen.Highlights.name) },
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
                 .padding(20.dp, 10.dp)
                 .fillMaxWidth()
-                .height(60.dp)
                 .align(alignment = Alignment.Start))
+
         {
-
-            Text(
-                text = "Steps",
-                color = colorResource(R.color.white),
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-        }
-
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .clip(RoundedCornerShape(20))
-                .background(colorResource(id = R.color.blue))
-        ) {
-
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -144,18 +192,16 @@ fun MainScreen(
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "On average you're walking less this year compared to last year.",
+                        text = "You are walking this week ",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
-
 
                 }
             }
 
         }
 
-        // Spacer(modifier = Modifier.size(230.dp))
 
         // Bryant - Start of weather box
         Box(
@@ -171,6 +217,7 @@ fun MainScreen(
 //                        viewModel.addSteps(sdk)
 
                         notificationWorker.triggerNotification(
+                            activity,
                             context,
                             "Week",
                             "$stepsWeek",
@@ -192,7 +239,10 @@ fun MainScreen(
 
                         // old data
                         val currentDateAndTime = System.currentTimeMillis()
-                        val mockDataWithPreviousDate = StepsData(stepCount = 200, previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)) // Uses previous date
+                        val mockDataWithPreviousDate = StepsData(
+                            stepCount = 200,
+                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
+                        ) // Uses previous date
 
                         viewModel.addSteps(mockDataWithPreviousDate)
 
@@ -278,53 +328,38 @@ fun MainScreen(
 
         } // end of weather box
 
-        Box(
+
+        Button(onClick = { navHostController.navigate(AppScreen.Tips.name) },
+            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            shape = RoundedCornerShape(20),
             modifier = Modifier
+                .padding(20.dp, 10.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .clip(RoundedCornerShape(20))
-                .background(colorResource(id = R.color.blue))
-        ) {
+                .align(alignment = Alignment.Start))
+
+        {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(75.dp),
-                        color = Color.LightGray,
-                        progress = dailyKCalProgress,
-                        strokeWidth = 8.dp,
-                    )
-
-                    Text(
-                        text = "" + (dailyKCalProgress*100).toInt() +"%",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 25.sp
-                    )
-                }
-
                 Column {
                     Text(
-                        text = "Great!",
+                        text = "Tips and tricks",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "You've lost "+ (dailyKCalProgress*100).toInt()+ "% of your \ndaily calorie intake",
+                        text = "Get an additional advice on losing weight.",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
+
                 }
-
-
             }
+
         }
 
 
@@ -334,7 +369,6 @@ fun MainScreen(
             modifier = Modifier
                 .padding(22.dp)
                 .fillMaxWidth()
-                .height(60.dp)
                 .align(alignment = Alignment.CenterHorizontally))
 
         {
