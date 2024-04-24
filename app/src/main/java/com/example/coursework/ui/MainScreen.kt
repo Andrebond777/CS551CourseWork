@@ -72,6 +72,8 @@ fun MainScreen(
     val stepsToday by viewModel.stepsToday.collectAsState()
     // steps week
     val stepsWeek by viewModel.stepsWeek.collectAsState()
+
+    val waterGiven by viewModel.waterGiven.collectAsState()
     val key = remember { mutableStateOf(0) }
 
     val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
@@ -219,11 +221,15 @@ fun MainScreen(
 //                        var sdk = StepsData(stepCount = 10)
 //                        viewModel.addSteps(sdk)
 
+                        // check the last water status
+                        // if does not exists, create a new one and set 0
+
+
                         notificationWorker.triggerNotification(
                             activity,
                             context,
                             "Week",
-                            "$stepsWeek",
+                            "$waterGiven"
                         )
                     },
                     onLongClick = {
@@ -231,23 +237,23 @@ fun MainScreen(
                         // note every time you add a new step data
                         // add this at last key.value++
                         // long click for now time
-                        var sdk = StepsData(stepCount = 10)
-                        viewModel.addSteps(sdk)
-                        key.value++
-
-                        var sdko = StepsData(stepCount = 5)
-                        viewModel.addSteps(sdko)
-                        key.value++
+//                        var sdk = StepsData(stepCount = 10)
+//                        viewModel.addSteps(sdk)
+//                        key.value++
+//
+//                        var sdko = StepsData(stepCount = 5)
+//                        viewModel.addSteps(sdko)
+//                        key.value++
 
 
                         // old data
-                        val currentDateAndTime = System.currentTimeMillis()
-                        val mockDataWithPreviousDate = StepsData(
-                            stepCount = 200,
-                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
-                        ) // Uses previous date
-
-                        viewModel.addSteps(mockDataWithPreviousDate)
+//                        val currentDateAndTime = System.currentTimeMillis()
+//                        val mockDataWithPreviousDate = StepsData(
+//                            stepCount = 200,
+//                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
+//                        ) // Uses previous date
+//
+//                        viewModel.addSteps(mockDataWithPreviousDate)
 
                         // expected behaviour is
                         // today = 15
@@ -259,6 +265,15 @@ fun MainScreen(
 //                            "Week",
 //                            "$stepsWeek",
 //                        )
+
+                        viewModel.setLastWaterDataToOne()
+
+                        notificationWorker.triggerNotification(
+                            activity,
+                            context,
+                            "Week",
+                            "Changed to 1",
+                        )
                     }
                 )
         ) {
