@@ -1,21 +1,24 @@
-package com.example.healthapproomdb.repository
+package com.example.coursework.repository
 
 import android.content.Context
 import androidx.lifecycle.asFlow
-import androidx.room.Insert
-import androidx.room.Query
 import androidx.room.Room
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.coursework.database.AppDatabase
+import com.example.coursework.model.StepsData
+import com.example.coursework.model.UserData
 import com.example.coursework.worker.GPSWorker
-import com.example.healthapproomdb.model.UserData
-import com.example.healthapproomdb.model.StepsData
+import com.example.coursework.worker.StepWorker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
+import java.util.concurrent.TimeUnit
 
 const val OUTPUT_TAG = "OUTPUT"
 class UserRepository(context: Context) {
+
 
     // Initialize the Room Database instance
     private val db = Room.databaseBuilder(
@@ -57,6 +60,8 @@ class UserRepository(context: Context) {
     }
 
     // get steps today
+
+
     fun getStepsToday(todayStart: Long): Int{
         return stepDao.getStepsToday(todayStart)
     }
@@ -77,6 +82,13 @@ class UserRepository(context: Context) {
         // Start the work
         workManager.enqueue(gpsBuilder.build())
     }
+
+    fun scheduleStepTracking() {
+        val workRequest = PeriodicWorkRequestBuilder<StepWorker>(15, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueueUniquePeriodicWork("StepTracking", ExistingPeriodicWorkPolicy.KEEP, workRequest)
+    }
+
 
 }
 

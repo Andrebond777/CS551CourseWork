@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,18 +38,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coursework.AppScreen
 import com.example.coursework.R
+import com.example.coursework.model.StepsData
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
-import com.example.healthapproomdb.model.StepsData
-import kotlinx.coroutines.Dispatchers
-import java.util.Calendar
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -104,7 +101,7 @@ fun MainScreen(
     ) {
 
         Button(
-            onClick = { navHostController.navigate(AppScreen.Tips.name) },
+            onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
@@ -115,7 +112,7 @@ fun MainScreen(
         {
 
             Text(
-                text = stepsToday.toString(),
+                text = "Steps",
                 color = colorResource(R.color.white),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
