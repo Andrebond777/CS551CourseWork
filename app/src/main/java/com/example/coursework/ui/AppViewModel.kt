@@ -219,10 +219,12 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         repository.runGPSWorker()
     }
 
+    //Runs Weather Watcher Workers
     fun runWeatherWatcherWorker(){
         repository.runWeatherWatcherWorker()
     }
 
+    //Function for testing purposes
     fun testWeatherWatcherWorker(){
         repository.testWeatherWatcherWorker()
     }

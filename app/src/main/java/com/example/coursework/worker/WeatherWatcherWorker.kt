@@ -75,8 +75,8 @@ class WeatherWatcherWorker (ctx: Context, params: WorkerParameters) : CoroutineW
 
                 task.join()
 
-                //Log.d(TAG, response.current.condition.code.toString())
-                //Log.d(TAG, response.location.name)
+                Log.d(TAG, response.current.condition.code.toString())
+                Log.d(TAG, response.location.name)
                 if(response.current.condition.code == 1003 || response.current.condition.code == 1000){
                     notificationWorker.triggerNotification(applicationContext, "It's nice outside","Be sure to reach your daily step goal!")
                 }

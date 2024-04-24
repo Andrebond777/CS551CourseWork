@@ -163,7 +163,7 @@ class UserRepository(context: Context) {
         //Log.d("TESTING1", currentTime.toString())
         //Log.d("TESTING2", delay.toString())
 
-        val weatherWatcherBuilder = PeriodicWorkRequestBuilder<StepWorker>(24, TimeUnit.HOURS)
+        val weatherWatcherBuilder = PeriodicWorkRequestBuilder<WeatherWatcherWorker>(24, TimeUnit.HOURS)
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()
 
