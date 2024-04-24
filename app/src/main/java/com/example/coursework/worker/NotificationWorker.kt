@@ -62,7 +62,7 @@ class NotificationWorker() {
 
         // Notification Builder
         val builder = NotificationCompat.Builder(context, "ChannelID")
-            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(textTitle)
             .setContentText(textContent)
             .setPriority(priority)
