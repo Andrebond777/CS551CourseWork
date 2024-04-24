@@ -1,6 +1,5 @@
 package com.example.coursework
 import android.annotation.SuppressLint
-import android.text.Highlights
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
