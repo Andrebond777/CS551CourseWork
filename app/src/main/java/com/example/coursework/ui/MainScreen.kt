@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -95,6 +96,7 @@ fun MainScreen(
 
     LaunchedEffect(key.value) {
         viewModel.getStepsLastSevenDays()
+        viewModel.getStepsEveryDayLastSevenDays()
         viewModel.getStepsToday()
     }
 
@@ -134,7 +136,7 @@ fun MainScreen(
                 Box(contentAlignment = Alignment.Center) {
                     if (dailyStepsProgress != null) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(75.dp),
+                            modifier = Modifier.size(90.dp),
                             color = Color.White,
                             progress = dailyStepsProgress,
                             strokeWidth = 8.dp
@@ -142,6 +144,7 @@ fun MainScreen(
                     }
                     if (dailyStepsProgress != null) {
                         Text(
+                            modifier = Modifier.padding(5.dp),
                             text = "" + (dailyStepsProgress*100).toInt() +"%",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,

@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -43,6 +44,8 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     private val _stepsToday = MutableStateFlow<Int?>(0)
     val stepsToday: StateFlow<Int?> = _stepsToday
     private val _stepsWeek = MutableStateFlow<Int?>(0)
+    var _stepsEveryDayWeek = mutableListOf<Int?>()
+
     val stepsWeek: StateFlow<Int?> = _stepsWeek
 
     private val _waterGiven = MutableStateFlow<Int?>(0)
@@ -183,6 +186,12 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         viewModelScope.launch(Dispatchers.IO) {
             val stepsWeek = repository.getStepsLastSevenDays(sevenDaysAgo, todayEnd)
             _stepsWeek.value = stepsWeek
+        }
+    }
+
+    fun getStepsEveryDayLastSevenDays() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _stepsEveryDayWeek = repository.getStepsEveryDayLastSevenDays(sevenDaysAgo, todayEnd).toMutableList()
         }
     }
 

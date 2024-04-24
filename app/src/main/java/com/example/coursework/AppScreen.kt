@@ -116,7 +116,8 @@ fun AppScreen(
             }
             composable(route = AppScreen.Highlights.name) {
                 HighlightsScreen(
-                    navController
+                    navController,
+                    viewModel
                 )
             }
             composable(route = AppScreen.StepsProgress.name) {

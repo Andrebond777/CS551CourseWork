@@ -25,6 +25,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import co.yml.charts.axis.AxisData
@@ -53,8 +56,10 @@ import kotlin.random.Random
 
 
 @Composable
-fun HighlightsScreen(navHostController: NavHostController)
+fun HighlightsScreen(navHostController: NavHostController, viewModel: AppViewModel)
 {
+    val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
+
     Column(
         modifier = Modifier
             .padding(5.dp, 0.dp),
@@ -97,11 +102,11 @@ fun HighlightsScreen(navHostController: NavHostController)
         Spacer(modifier = Modifier.padding(15.dp))
 
 
-        val listSize = 7;
-        val maxRange = 50
+        val listSize = stepsEveryDayOfWeek.size;
+        val maxRange = stepsEveryDayOfWeek.maxBy { x -> x!! }!!;
         val barData = arrayListOf<BarData>()
         for (index in 0 until  listSize) {
-            val point =  Point(index.toFloat(), index.toFloat());
+            val point =  Point(index.toFloat(), stepsEveryDayOfWeek[index]!!.toFloat());
             barData.add(
                 BarData(
                     point = point,
@@ -149,7 +154,8 @@ fun HighlightsScreen(navHostController: NavHostController)
 fun HighlightsPreview() {
     CourseWorkTheme {
         HighlightsScreen(
-            navHostController = rememberNavController()
+            navHostController = rememberNavController(),
+            viewModel = viewModel()
         )
     }
 }

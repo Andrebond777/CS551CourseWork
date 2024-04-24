@@ -83,6 +83,10 @@ class UserRepository(context: Context) {
         return stepDao.getStepsLastSevenDays(sevenDaysAgo, todayEnd)
     }
 
+    fun getStepsEveryDayLastSevenDays(sevenDaysAgo: Long, todayEnd: Long): List<Int> {
+        return stepDao.getStepsEveryDayLastSevenDays(sevenDaysAgo, todayEnd)
+    }
+
     suspend fun addSteps(stepsData: StepsData) {
         stepDao.addSteps(stepsData)
     }
