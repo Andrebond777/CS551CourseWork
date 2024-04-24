@@ -215,8 +215,16 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     // room database function ends here -------->
 
     //Use to Run GPS worker to fetch GPS location into
-    fun getGPSLocation(){
-        repository.getGPSLocation()
+    fun runGPSWorker(){
+        repository.runGPSWorker()
+    }
+
+    fun runWeatherWatcherWorker(){
+        repository.runWeatherWatcherWorker()
+    }
+
+    fun testWeatherWatcherWorker(){
+        repository.testWeatherWatcherWorker()
     }
 
 
