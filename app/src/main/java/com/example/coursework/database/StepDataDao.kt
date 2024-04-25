@@ -27,6 +27,10 @@ interface StepDataDao {
     @Query("SELECT stepCount FROM steps WHERE dateAndTimeAdded >= :sevenDaysAgo AND dateAndTimeAdded <= :todayEnd")
     fun getStepsEveryDayLastSevenDays(sevenDaysAgo: Long, todayEnd: Long): List<Int>
 
+    @Query("SELECT SUM(stepCount) AS totalSteps FROM steps GROUP BY strftime('%Y-%m-%d', dateAndTimeAdded / 1000, 'unixepoch')")
+    fun getStepsEachDay(): List<Int>
+
+
     @Insert
     suspend fun addSteps(stepsData: StepsData)
 }

@@ -13,10 +13,13 @@ import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.model.WaterData
 import com.example.coursework.worker.GPSWorker
+import com.example.coursework.worker.NotificationWorker
 import com.example.coursework.worker.StepWorker
 import com.example.coursework.worker.WeatherWatcherWorker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -86,7 +89,7 @@ class UserRepository(context: Context) {
     }
 
     fun getStepsEveryDayLastSevenDays(sevenDaysAgo: Long, todayEnd: Long): List<Int> {
-        return stepDao.getStepsEveryDayLastSevenDays(sevenDaysAgo, todayEnd)
+        return stepDao.getStepsEachDay()
     }
 
     suspend fun addSteps(stepsData: StepsData) {
@@ -182,6 +185,7 @@ class UserRepository(context: Context) {
         // Start the work
         workManager.enqueue(gpsBuilder.build())
     }
+
 
     fun scheduleStepTracking() {
         val workRequest = PeriodicWorkRequestBuilder<StepWorker>(15, TimeUnit.MINUTES)

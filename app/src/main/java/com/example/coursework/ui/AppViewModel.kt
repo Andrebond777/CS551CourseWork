@@ -1,5 +1,6 @@
 package com.example.coursework.ui
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -24,11 +25,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Calendar
+
+
+var notificationIdCounter = 0
 
 // Weather API
 sealed class WeatherState{
@@ -46,7 +49,6 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     val stepsToday: StateFlow<Int?> = _stepsToday
     private val _stepsWeek = MutableStateFlow<Int?>(0)
     var _stepsEveryDayWeek = mutableListOf<Int?>()
-
     val stepsWeek: StateFlow<Int?> = _stepsWeek
 
     private val _waterGiven = MutableStateFlow<Int?>(0)
@@ -366,7 +368,59 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         Log.d("Notification", "Notification posted: $title - $text")
     }
 
+     fun checkStepsActivityAndNotify() {
+         Log.d("HI", "entered checkStepsActivity")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Log.d("HI", "in build version")
+            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Log the lack of permissions
+                Log.d("HI", "POST_NOTIFICATIONS permission is not granted.")
+                // Request the permission here
+
+                return
+            } else {
+                Log.d("HI", "entered else")
+                val currentCalendar = Calendar.getInstance()
+                val endOfWeek = currentCalendar.timeInMillis
+                val todayStart: Long = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+                val startOfWeek = endOfWeek - (7 * 24 * 60 * 60 * 1000) // 7 days in milliseconds
+
+                // Get total steps for the current week
+                val today = repository.getStepsToday(todayStart)
+                Log.d("HI", "Steps today $today")
+
+                // Get total steps for the last week
+                val lastWeekSteps = repository.getStepsLastSevenDays(startOfWeek - (7 * 24 * 60 * 60 * 1000), startOfWeek)
+                // Calculate average steps for last week
+                Log.d("HI", "Steps lastweek  $lastWeekSteps")
+                val averageLastWeekSteps = lastWeekSteps / 7
+                Log.d("HI", "Steps average  $averageLastWeekSteps")
+
+                // If current week's steps are less than last week's average steps, trigger notification
+                if (today < averageLastWeekSteps) {
+                    Log.d("HI", "in step comparison")
+                    // Trigger notification or perform any action
+                    // For simplicity, I'll just print a log message
+                    val notificationManager = NotificationManagerCompat.from(context)
+                    val notificationId = notificationIdCounter++
+
+                    val builder = NotificationCompat.Builder(context, "your_channel_id")
+                        .setSmallIcon(android.R.drawable.ic_dialog_info)
+                        .setContentTitle("Update")
+                        .setContentText("Activity less than average")
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true)
 
 
-
+                    notificationManager.notify(notificationId, builder.build())
+                    Log.d("HI", "Steps activity is less than usual!")
+                }
+            }
+        }
+    }
 }

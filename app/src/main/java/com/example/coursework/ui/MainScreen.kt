@@ -223,17 +223,32 @@ fun MainScreen(
                 .combinedClickable(
                     onClick = {
 
-                        notificationWorker.triggerNotification(
-                            context,
-                            "Week",
-                            "$waterGiven"
-                        )
+//                        notificationWorker.triggerNotification(
+//                            context,
+//                            "Week",
+//                            "$waterGiven"
+//                        )
+                              viewModel.addSteps(
+                                  StepsData(
+                                      stepCount = 10,
+                                      dateAndTimeAdded = System.currentTimeMillis()
+                                  )
+                              )
                     },
                     onLongClick = {
 
-                        viewModel.setLastWaterDataToOne()
+//                        viewModel.setLastWaterDataToOne()
 //                        viewModel.getLastWaterDataSameDate()
 //                        viewModel.addMockDataWater()
+//                        viewModel.addSteps(
+//                            StepsData(
+//                                stepCount = 3,
+//                                dateAndTimeAdded = System.currentTimeMillis()
+//                            )
+//                        )
+                        viewModel.addSteps(StepsData(stepCount = 10, System.currentTimeMillis() - ((7 * 24 * 60 * 60 * 1000))))
+                        viewModel.addSteps(StepsData(stepCount = 20, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
+                        viewModel.addSteps(StepsData(stepCount = 30, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
 
 //                        notificationWorker.triggerNotification(
 //                            context,

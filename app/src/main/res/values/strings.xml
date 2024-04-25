@@ -16,4 +16,8 @@
     <string name="channel_description">Notifications for step count progress and milestones</string>
     <string name="steps_progress_screen">Steps</string>
     <string name="highlights_screen">Highlights</string>
+    <string name="activity_update">Activity Update</string>
+    <string name="more_than">More than average</string>
+    <string name="less_than">Less than average</string>
+
 </resources>
