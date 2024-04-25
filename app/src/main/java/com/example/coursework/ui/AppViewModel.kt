@@ -205,6 +205,12 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         }
     }
 
+    fun addMockDataWater() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addMockData()
+        }
+    }
+
     // check if same date value exists
     // if not
     // create a row with value set to 1

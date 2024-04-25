@@ -10,7 +10,7 @@ data class WaterData(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val waterNotificationGiven: Int = 0,
-    val dateAndTimeOfNotification: Long = System.currentTimeMillis()
+    val dateAndTimeOfNotification: Long
 ) {
     fun isNotificationOnSameDay(): Boolean {
         val notificationCalendar = Calendar.getInstance()

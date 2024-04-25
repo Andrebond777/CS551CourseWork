@@ -264,6 +264,8 @@ fun MainScreen(
                     onLongClick = {
 
                         viewModel.setLastWaterDataToOne()
+//                        viewModel.getLastWaterDataSameDate()
+//                        viewModel.addMockDataWater()
 
 //                        notificationWorker.triggerNotification(
 //                            context,
