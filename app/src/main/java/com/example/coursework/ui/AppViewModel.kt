@@ -47,6 +47,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     private val _stepsWeek = MutableStateFlow<Int?>(0)
     var _stepsEveryDayWeek = mutableListOf<Int?>()
 
+
     val stepsWeek: StateFlow<Int?> = _stepsWeek
 
     private val _waterGiven = MutableStateFlow<Int?>(0)
@@ -194,6 +195,11 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         viewModelScope.launch(Dispatchers.IO) {
             _stepsEveryDayWeek = repository.getStepsEveryDayLastSevenDays(sevenDaysAgo, todayEnd).toMutableList()
         }
+    }
+
+    public fun getDate(stepCount: Int): Long {
+            return repository.getDate(stepCount);
+
     }
 
     // return last same date value
