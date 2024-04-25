@@ -61,7 +61,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     init {
         startSensorListener()
-
+        setLastWaterDataToOne()
     }
 
     private fun startSensorListener() {
@@ -234,8 +234,10 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     // AND
     // the steps is over 1000
     // Hit the trigger
-    fun runStepsWatcher(){
+    fun runStepsWatcher(): StateFlow<Int?> {
+//        repository.getLastWaterDataSameDate()
         val isTrigger = getLastWaterDataSameDate() // *** Expecting getting int but i getting Kotlin.Unit
+        // val isTrigger = waterGiven.value
         val noti = NotificationWorker()
 
 //        if(!isTrigger){
@@ -244,6 +246,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 //            }
 //        }
         // Then update the waterTrigger to 1
+        return waterGiven
     }
 
     fun testReturnSteps(): StateFlow<Int?> {

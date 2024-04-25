@@ -1,6 +1,9 @@
 package com.example.coursework.ui
 
+import android.Manifest
 import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -55,9 +58,11 @@ import com.example.coursework.model.StepsData
 import com.example.coursework.model.WaterData
 import com.example.coursework.repository.UserRepository
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     viewModel: AppViewModel,
@@ -90,9 +95,36 @@ fun MainScreen(
     // Call notification function from NotificationWorker
     val notificationWorker = NotificationWorker()
 
-    // When apps run, will enable the notification channel first
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    val activityPermissionState = rememberPermissionState(Manifest.permission.ACTIVITY_RECOGNITION)
+
+    val requestMultiplePermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsMap ->
+        val deniedPermissions = permissionsMap.entries.filter { !it.value }.map { it.key }
+        if (deniedPermissions.isNotEmpty()) {
+            // Handle denied permissions
+        } else {
+            // All requested permissions were granted
+        }
+    }
+
     LaunchedEffect(Unit) {
         notificationWorker.createNotificationChannel("ChannelID", context)
+
+        val requiredPermissions = mutableListOf<String>()
+
+        if (!locationPermissionState.status.isGranted) {
+            requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
+        if (!activityPermissionState.status.isGranted) {
+            requiredPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+
+        if (requiredPermissions.isNotEmpty()) {
+            requestMultiplePermissionsLauncher.launch(requiredPermissions.toTypedArray())
+        }
     }
 
     LaunchedEffect(key.value) {
@@ -116,7 +148,7 @@ fun MainScreen(
     viewModel.runWeatherWatcherWorker()
 
     // Water Drinking
-    viewModel.runStepsWatcher()
+    val s = viewModel.runStepsWatcher()
 
 
     Column(
@@ -160,7 +192,7 @@ fun MainScreen(
 
                 Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                     Text(
-                        text = "Great!",
+                        text = "${s} Great!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
