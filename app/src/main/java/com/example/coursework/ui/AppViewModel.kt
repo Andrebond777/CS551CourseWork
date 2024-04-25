@@ -184,6 +184,13 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         }
     }
 
+    fun getT(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val row = repository.getNewWaterData()
+            _isTrigger.value = row.isTrigger.toString()
+        }
+    }
+
     fun runWaterTrigger(){
 //        viewModelScope.launch(Dispatchers.IO) {
 //

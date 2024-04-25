@@ -92,6 +92,8 @@ fun MainScreen(
     val key = remember { mutableStateOf(0) }
 
     val isTrg by viewModel.isTrigger.collectAsState()
+
+
     val dateToday by viewModel.dateToday.collectAsState()
 
     val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
@@ -219,7 +221,7 @@ fun MainScreen(
 
             Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(
-                    text = "$dateToday",
+                    text = "$isTrg",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -297,7 +299,8 @@ fun MainScreen(
 //                                      dateAndTimeAdded = System.currentTimeMillis()
 //                                  )
 //                              )
-                        viewModel.getNewWaterData()
+//                        viewModel.getNewWaterData()
+                              viewModel.getT()
                     },
                     onLongClick = {
 
