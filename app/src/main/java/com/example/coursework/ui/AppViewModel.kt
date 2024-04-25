@@ -1,5 +1,6 @@
 package com.example.coursework.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -8,14 +9,21 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.coursework.data.UiState
 import com.example.coursework.data.WeatherApi
 import com.example.coursework.data.WeatherData
+import com.example.coursework.model.NewWaterData
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.repository.UserRepository
@@ -28,6 +36,8 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 // Weather API
@@ -61,7 +71,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     init {
         startSensorListener()
-        setLastWaterDataToOne()
+        // setLastWaterDataToOne()
     }
 
     private fun startSensorListener() {
@@ -148,6 +158,81 @@ class AppViewModel(private val context: Context, private val repository: UserRep
             }
         }
     } // end of function fetchWeatherData
+
+    private val _dateToday = MutableStateFlow<String?>("")
+    val dateToday: StateFlow<String?> = _dateToday
+
+    private val _dateYtd  = MutableStateFlow<String?>("")
+    val dateYtd: StateFlow<String?> = _dateYtd
+
+    private val _dateCurrent  = MutableStateFlow<String?>("")
+    val dateCurrent: StateFlow<String?> = _dateCurrent
+
+    private val _isWaterTrigger = MutableStateFlow<Int?>(0)
+    val isWaterTrigger: StateFlow<Int?> = _isWaterTrigger
+
+
+    fun getNewWaterData(){
+        viewModelScope.launch(Dispatchers.IO) {
+            _dateToday.value = repository.getNewWaterData().toString()
+        }
+    }
+    @SuppressLint("NewApi")
+    fun runWaterTrigger(){
+//        viewModelScope.launch(Dispatchers.IO) {
+//
+//        }
+
+
+        val newWaterData = repository.getNewWaterData()
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val formattedDateToday = currentDate.format(formatter)
+
+        // When first run, they are all empty value,
+        // assign them the value
+        if(_dateToday.value == "" && _dateYtd.value == "" && _dateCurrent.value == ""){
+
+            val ytdDate = LocalDate.now().minusDays(1)
+            val formattedDateYtd = ytdDate.format(formatter)
+
+            _dateToday.value = formattedDateToday
+            _dateYtd.value = formattedDateYtd
+            _dateCurrent.value = formattedDateToday
+
+            var newWaterData = NewWaterData(1, 0, formattedDateToday)
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.upsertNewWaterData(newWaterData)
+            }
+
+        }
+
+//         check variable _dateToday is same date as todays Date
+//         else update the date, and update the isWaterTrigger to 0
+        if(dateToday.value != formattedDateToday){
+            val ytdDate = LocalDate.now().minusDays(1)
+            val formattedDateYtd = ytdDate.format(formatter)
+
+            // Update the date from previous up-to-date
+            _dateToday.value = formattedDateToday
+            _dateYtd.value = formattedDateYtd
+            _dateCurrent.value = formattedDateToday
+            _isWaterTrigger.value = 0
+        }
+
+//         When the steps is over 2500 and has been trigger by today yet,
+//         trigger the notification
+        if(stepsToday.value!! > 1780 && isWaterTrigger.value != 1){
+            val notificationWorker = NotificationWorker()
+            notificationWorker.triggerNotification(context, "Stay Hydrated", "Stay Healthy, Drink Water.")
+            _isWaterTrigger.value = 1
+        }
+
+//        return readAllData.toString()
+
+    }
+
+
 
     // room database functions starts here ------>
     // Function to get all usersData
@@ -240,7 +325,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     // AND
     // the steps is over 1000
     // Hit the trigger
-    fun runStepsWatcher(): StateFlow<Int?> {
+    fun runStepsWatcher(): Int? {
 //        repository.getLastWaterDataSameDate()
         val isTrigger = getLastWaterDataSameDate() // *** Expecting getting int but i getting Kotlin.Unit
         // val isTrigger = waterGiven.value
@@ -252,7 +337,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 //            }
 //        }
         // Then update the waterTrigger to 1
-        return waterGiven
+        return waterGiven.value
     }
 
     fun testReturnSteps(): StateFlow<Int?> {

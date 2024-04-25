@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.coursework.database.AppDatabase
+import com.example.coursework.model.NewWaterData
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.model.WaterData
@@ -39,6 +40,8 @@ class UserRepository(context: Context) {
 
     private val waterDao = db.waterDao()
 
+    private val newWaterDao = db.newWaterDao()
+
     //Workmanager used to run workers
     private val workManager = WorkManager.getInstance(context)
 
@@ -53,6 +56,16 @@ class UserRepository(context: Context) {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
+
+    // New Water Trigger - Get all data
+    fun getNewWaterData(): Flow<List<NewWaterData>>{
+        return newWaterDao.getWaterData()
+    }
+
+    suspend fun upsertNewWaterData(waterData: NewWaterData){
+        newWaterDao.upsertWaterTrigger(waterData)
+    }
+
 
     // Function to get all users
     fun getAllUserData(): Flow<List<UserData>> {

@@ -96,8 +96,11 @@ fun MainScreen(
     val notificationWorker = NotificationWorker()
 
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    val locPermission           = rememberPermissionState(Manifest.permission.ACCESS_COARSE_LOCATION)
     val activityPermissionState = rememberPermissionState(Manifest.permission.ACTIVITY_RECOGNITION)
+    val notiPermissionState     = rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
 
+    // Request permission
     val requestMultiplePermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsMap ->
@@ -109,6 +112,7 @@ fun MainScreen(
         }
     }
 
+    // WHen the apps first Launch, run this
     LaunchedEffect(Unit) {
         notificationWorker.createNotificationChannel("ChannelID", context)
 
@@ -122,15 +126,23 @@ fun MainScreen(
             requiredPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
 
+        if (!locPermission.status.isGranted) {
+            requiredPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+
+        if (!notiPermissionState.status.isGranted) {
+            requiredPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         if (requiredPermissions.isNotEmpty()) {
             requestMultiplePermissionsLauncher.launch(requiredPermissions.toTypedArray())
         }
     }
 
     LaunchedEffect(key.value) {
-        viewModel.getStepsLastSevenDays()
-        viewModel.getStepsEveryDayLastSevenDays()
-        viewModel.getStepsToday()
+//        viewModel.getStepsLastSevenDays()
+//        viewModel.getStepsEveryDayLastSevenDays()
+//        viewModel.getStepsToday()
     }
 
     //GPS TESTING
@@ -148,7 +160,7 @@ fun MainScreen(
     viewModel.runWeatherWatcherWorker()
 
     // Water Drinking
-    val s = viewModel.runStepsWatcher()
+    viewModel.runWaterTrigger()
 
 
     Column(
@@ -192,7 +204,7 @@ fun MainScreen(
 
                 Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                     Text(
-                        text = "${s} Great!",
+                        text = "Great!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
