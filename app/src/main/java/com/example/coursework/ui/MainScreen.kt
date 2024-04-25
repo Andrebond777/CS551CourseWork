@@ -45,7 +45,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coursework.AppScreen
 import com.example.coursework.R
-import com.example.coursework.model.StepsData
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
 import java.time.DayOfWeek
