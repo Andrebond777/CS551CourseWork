@@ -19,6 +19,7 @@ import com.example.coursework.data.WeatherData
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.repository.UserRepository
+import com.example.coursework.worker.NotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,7 +66,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     private fun startSensorListener() {
         stepSensor?.also {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
         }
     }
 
@@ -226,6 +227,27 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     //Use to Run GPS worker to fetch GPS location into
     fun runGPSWorker(){
         repository.runGPSWorker()
+    }
+
+    // If todays water drinking is not been trigger
+    // NOT BEEN TRIGGER VALUE SHOULD BE 0
+    // AND
+    // the steps is over 1000
+    // Hit the trigger
+    fun runStepsWatcher(){
+        val isTrigger = getLastWaterDataSameDate() // *** Expecting getting int but i getting Kotlin.Unit
+        val noti = NotificationWorker()
+
+//        if(!isTrigger){
+//            if(stepsToday.value?.toInt()!! > 1000){
+//                noti.triggerNotification( context, "Stay Hydrated", "Time to drink some water.")
+//            }
+//        }
+        // Then update the waterTrigger to 1
+    }
+
+    fun testReturnSteps(): StateFlow<Int?> {
+        return stepsToday
     }
 
     //Runs Weather Watcher Workers

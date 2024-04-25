@@ -52,6 +52,7 @@ import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
 import com.example.coursework.model.StepsData
+import com.example.coursework.model.WaterData
 import com.example.coursework.repository.UserRepository
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
@@ -113,6 +114,10 @@ fun MainScreen(
     //viewModel.testWeatherWatcherWorker()
 
     viewModel.runWeatherWatcherWorker()
+
+    // Water Drinking
+    viewModel.runStepsWatcher()
+
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -217,16 +222,8 @@ fun MainScreen(
                 .background(colorResource(id = R.color.blue))
                 .combinedClickable(
                     onClick = {
-//                        mock data
-//                        var sdk = StepsData(stepCount = 10)
-//                        viewModel.addSteps(sdk)
-
-                        // check the last water status
-                        // if does not exists, create a new one and set 0
-
 
                         notificationWorker.triggerNotification(
-                            activity,
                             context,
                             "Week",
                             "$waterGiven"
@@ -234,46 +231,13 @@ fun MainScreen(
                     },
                     onLongClick = {
 
-                        // note every time you add a new step data
-                        // add this at last key.value++
-                        // long click for now time
-//                        var sdk = StepsData(stepCount = 10)
-//                        viewModel.addSteps(sdk)
-//                        key.value++
-//
-//                        var sdko = StepsData(stepCount = 5)
-//                        viewModel.addSteps(sdko)
-//                        key.value++
-
-
-                        // old data
-//                        val currentDateAndTime = System.currentTimeMillis()
-//                        val mockDataWithPreviousDate = StepsData(
-//                            stepCount = 200,
-//                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
-//                        ) // Uses previous date
-//
-//                        viewModel.addSteps(mockDataWithPreviousDate)
-
-                        // expected behaviour is
-                        // today = 15
-                        // week = 215
-
+                        viewModel.setLastWaterDataToOne()
 
 //                        notificationWorker.triggerNotification(
 //                            context,
 //                            "Week",
-//                            "$stepsWeek",
+//                            "Changed to 1",
 //                        )
-
-                        viewModel.setLastWaterDataToOne()
-
-                        notificationWorker.triggerNotification(
-                            activity,
-                            context,
-                            "Week",
-                            "Changed to 1",
-                        )
                     }
                 )
         ) {
@@ -290,13 +254,6 @@ fun MainScreen(
                     when (weatherState) {
                         is WeatherState.Success -> {
                             val weatherData = (weatherState as WeatherState.Success).weatherData
-
-                            // When successfully getting the data from the api, call the notification funciton
-//                            notificationWorker.triggerNotification(
-//                                context,
-//                                "Testing Notification123",
-//                                "Notification Message"
-//                            )
 
                             Text(
                                 text = "${weatherData.location.name}, ${weatherData.location.country}",
