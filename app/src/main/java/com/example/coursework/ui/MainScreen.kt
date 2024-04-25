@@ -158,16 +158,6 @@ fun MainScreen(
     }
 
 
-
-    //GPS TESTING
-    //Uncomment to get a notification containing latitude and longitude when opening application
-
-    /*
-    var location= viewModel.location.collectAsState(initial = DoubleArray(2))
-    val notificationString =  location.value[0].toString() + " " + location.value[1].toString()
-    notificationWorker.triggerNotification(activity, context, "GPS TEST", notificationString)
-    */
-
     //Runs the Weather Watcher worker for testing purposes
     //viewModel.testWeatherWatcherWorker()
 

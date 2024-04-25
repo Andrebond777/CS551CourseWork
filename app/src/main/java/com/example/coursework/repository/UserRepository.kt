@@ -1,7 +1,6 @@
 package com.example.coursework.repository
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -13,14 +12,10 @@ import com.example.coursework.model.NewWaterData
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.model.WaterData
-import com.example.coursework.worker.GPSWorker
-import com.example.coursework.worker.NotificationWorker
 import com.example.coursework.worker.StepWorker
 import com.example.coursework.worker.WeatherWatcherWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -174,15 +169,6 @@ class UserRepository(context: Context) {
             // creating a new data record set to zero
             waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis()))
         }
-    }
-
-    //Runs the GPS Worker
-    fun runGPSWorker() {
-        val gpsBuilder = OneTimeWorkRequestBuilder<GPSWorker>()
-            .addTag(OUTPUT_TAG)
-
-        // Start the work
-        workManager.enqueue(gpsBuilder.build())
     }
 
     fun runWeatherWatcherWorker(){
