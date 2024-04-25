@@ -51,6 +51,10 @@ import com.example.coursework.worker.NotificationWorker
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.Date
+import com.example.coursework.model.StepsData
+import com.example.coursework.model.WaterData
+import com.example.coursework.repository.UserRepository
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 
 fun getDate(daysAgo: Int): DayOfWeek? {
@@ -76,6 +80,8 @@ fun MainScreen(
     val stepsToday by viewModel.stepsToday.collectAsState()
     // steps week
     val stepsWeek by viewModel.stepsWeek.collectAsState()
+
+    val waterGiven by viewModel.waterGiven.collectAsState()
     val key = remember { mutableStateOf(0) }
 
     val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
@@ -122,6 +128,10 @@ fun MainScreen(
 //    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
 //    val maxStepsDay = stepsEveryDayOfWeek.indexOf(maxStepsCount);
 //    val what = stepsEveryDayOfWeek.maxOf { x -> x!! };
+  
+    // Water Drinking
+    viewModel.runStepsWatcher()
+
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -226,49 +236,23 @@ fun MainScreen(
                 .background(colorResource(id = R.color.blue))
                 .combinedClickable(
                     onClick = {
-//                        mock data
-//                        var sdk = StepsData(stepCount = 10)
-//                        viewModel.addSteps(sdk)
 
                         notificationWorker.triggerNotification(
-                            activity,
                             context,
                             "Week",
-                            "$stepsWeek",
+                            "$waterGiven"
                         )
                     },
                     onLongClick = {
 
-                        // note every time you add a new step data
-                        // add this at last key.value++
-                        // long click for now time
-                        var sdk = StepsData(stepCount = 10)
-                        viewModel.addSteps(sdk)
-                        key.value++
-
-                        var sdko = StepsData(stepCount = 5)
-                        viewModel.addSteps(sdko)
-                        key.value++
-
-
-                        // old data
-                        val currentDateAndTime = System.currentTimeMillis()
-                        val mockDataWithPreviousDate = StepsData(
-                            stepCount = 200,
-                            previousDateMillis = currentDateAndTime - (24 * 60 * 60 * 1000)
-                        ) // Uses previous date
-
-                        viewModel.addSteps(mockDataWithPreviousDate)
-
-                        // expected behaviour is
-                        // today = 15
-                        // week = 215
-
+                        viewModel.setLastWaterDataToOne()
+//                        viewModel.getLastWaterDataSameDate()
+//                        viewModel.addMockDataWater()
 
 //                        notificationWorker.triggerNotification(
 //                            context,
 //                            "Week",
-//                            "$stepsWeek",
+//                            "Changed to 1",
 //                        )
                     }
                 )
@@ -286,13 +270,6 @@ fun MainScreen(
                     when (weatherState) {
                         is WeatherState.Success -> {
                             val weatherData = (weatherState as WeatherState.Success).weatherData
-
-                            // When successfully getting the data from the api, call the notification funciton
-//                            notificationWorker.triggerNotification(
-//                                context,
-//                                "Testing Notification123",
-//                                "Notification Message"
-//                            )
 
                             Text(
                                 text = "${weatherData.location.name}, ${weatherData.location.country}",

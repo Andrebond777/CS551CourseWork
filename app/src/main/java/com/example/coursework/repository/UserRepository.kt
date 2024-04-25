@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import com.example.coursework.database.AppDatabase
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
+import com.example.coursework.model.WaterData
 import com.example.coursework.worker.GPSWorker
 import com.example.coursework.worker.StepWorker
 import com.example.coursework.worker.WeatherWatcherWorker
@@ -29,10 +30,14 @@ class UserRepository(context: Context) {
         AppDatabase::class.java, "user-database"
     ).build()
 
+
+
     // Get the User DAO
     private val userDao = db.userDao()
 
     private val stepDao = db.stepDao()
+
+    private val waterDao = db.waterDao()
 
     //Workmanager used to run workers
     private val workManager = WorkManager.getInstance(context)
@@ -40,6 +45,13 @@ class UserRepository(context: Context) {
     //variable that keeps the output of the GPSworker
     var outputWorkInfo = workManager.getWorkInfosByTagLiveData(OUTPUT_TAG).asFlow().mapNotNull {
         if (it.isNotEmpty()) it.first() else null
+    }
+
+    private fun isSameDay(date1: Long, date2: Long): Boolean {
+        val cal1 = Calendar.getInstance().apply { timeInMillis = date1 }
+        val cal2 = Calendar.getInstance().apply { timeInMillis = date2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
     // Function to get all users
@@ -87,6 +99,67 @@ class UserRepository(context: Context) {
         stepDao.addSteps(stepsData)
     }
 
+    // water
+    fun getLastWaterData(): WaterData {
+        return waterDao.getLastWaterData()
+    }
+
+    fun getLastWaterDataSameDate(): Int {
+        val lastWaterData = getLastWaterData()
+        if (lastWaterData != null) {
+            val currentDate = Calendar.getInstance().apply {
+                // Reset hours, minutes, seconds, and milliseconds to 0 for comparison
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+
+            // if data exists for the same date
+            if (isSameDay(lastWaterData.dateAndTimeOfNotification, currentDate)) {
+                return lastWaterData.waterNotificationGiven
+            }
+        }
+        return -1
+    }
+
+    // get last water data, check if the date is same and the value if 1 (true)
+    // if the value is true, return 1
+    // if not true, set true and return 1
+    // if record does not exists, create a record and set value to true and return 1
+    // sql error return -1
+
+    suspend fun addMockData() {
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (9 * 24 * 60 * 60 * 1000)))
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (8 * 24 * 60 * 60 * 1000)))
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000)))
+    }
+
+    suspend fun setLastWaterDataToOne() {
+        val lastWaterData = getLastWaterData()
+        // if no record exists with the current date
+        // create a new record and set to 0
+        if (lastWaterData != null) {
+            val currentDate = Calendar.getInstance().apply {
+                // Reset hours, minutes, seconds, and milliseconds to 0 for comparison
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+
+            // if data exists for the same date
+            if (!isSameDay(lastWaterData.dateAndTimeOfNotification, currentDate)) {
+                // if the last record is 0
+                waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis()))
+            }
+        } else {
+            // no previous data of same date found
+            // creating a new data record set to zero
+            waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis()))
+        }
+    }
+
     //Runs the GPS Worker
     fun runGPSWorker() {
         val gpsBuilder = OneTimeWorkRequestBuilder<GPSWorker>()
@@ -102,7 +175,7 @@ class UserRepository(context: Context) {
         //Log.d("TESTING1", currentTime.toString())
         //Log.d("TESTING2", delay.toString())
 
-        val weatherWatcherBuilder = PeriodicWorkRequestBuilder<StepWorker>(24, TimeUnit.HOURS)
+        val weatherWatcherBuilder = PeriodicWorkRequestBuilder<WeatherWatcherWorker>(24, TimeUnit.HOURS)
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()
 

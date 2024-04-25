@@ -19,6 +19,7 @@ import com.example.coursework.data.WeatherData
 import com.example.coursework.model.StepsData
 import com.example.coursework.model.UserData
 import com.example.coursework.repository.UserRepository
+import com.example.coursework.worker.NotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +49,10 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
 
     val stepsWeek: StateFlow<Int?> = _stepsWeek
+
+    private val _waterGiven = MutableStateFlow<Int?>(0)
+    val waterGiven: StateFlow<Int?> = _waterGiven
+
     //variable that fetches the output of the gps worker from the repository
     val location: Flow<DoubleArray> = repository.outputWorkInfo
         .map { info ->
@@ -62,7 +67,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     private fun startSensorListener() {
         stepSensor?.also {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
         }
     }
 
@@ -197,8 +202,31 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     }
 
+    // return last same date value
+    // -1 if no value of same date exists
+    fun getLastWaterDataSameDate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val waterGiven = repository.getLastWaterDataSameDate()
+            _waterGiven.value = waterGiven
+        }
+    }
 
+    fun addMockDataWater() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addMockData()
+        }
+    }
 
+    // check if same date value exists
+    // if not
+    // create a row with value set to 1
+    fun setLastWaterDataToOne() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.setLastWaterDataToOne()
+            val waterGiven = repository.getLastWaterDataSameDate()
+            _waterGiven.value = waterGiven
+        }
+    }
 
     fun addSteps(step: StepsData) {
         viewModelScope.launch {
@@ -213,10 +241,33 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         repository.runGPSWorker()
     }
 
+    // If todays water drinking is not been trigger
+    // NOT BEEN TRIGGER VALUE SHOULD BE 0
+    // AND
+    // the steps is over 1000
+    // Hit the trigger
+    fun runStepsWatcher(){
+        val isTrigger = getLastWaterDataSameDate() // *** Expecting getting int but i getting Kotlin.Unit
+        val noti = NotificationWorker()
+
+//        if(!isTrigger){
+//            if(stepsToday.value?.toInt()!! > 1000){
+//                noti.triggerNotification( context, "Stay Hydrated", "Time to drink some water.")
+//            }
+//        }
+        // Then update the waterTrigger to 1
+    }
+
+    fun testReturnSteps(): StateFlow<Int?> {
+        return stepsToday
+    }
+
+    //Runs Weather Watcher Workers
     fun runWeatherWatcherWorker(){
         repository.runWeatherWatcherWorker()
     }
 
+    //Function for testing purposes
     fun testWeatherWatcherWorker(){
         repository.testWeatherWatcherWorker()
     }

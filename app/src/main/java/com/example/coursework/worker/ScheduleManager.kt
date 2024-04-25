@@ -26,27 +26,6 @@ class ScheduleManager(
         return Result.success()
     }
 
-    private suspend fun getWeatherData(): WeatherData {
-        // Implement logic to fetch the current weather data
-        // This can be done using a weather API or any other data source
-        return WeatherData(
-            location = Location(
-                name = "Glasgow",
-                region = "UK",
-                country = "UK1"
-            ),
-            current = Current(
-                temp_c = 12.1,
-                humidity = 123,
-                wind_kph = 123.0,
-                condition = Condition(
-                    text = "Sunny",
-                    icon = "",
-                    code = 123
-                )
-            )
-        )
-    }
 
         private fun sendNotificationIfWeatherChanged() {
         // Check if the weather has changed compared to the previous state
@@ -77,6 +56,6 @@ class ScheduleManager(
             // Call function from NotificationWorker and trigger
             val noti = NotificationWorker()
 
-            noti.triggerNotification(applicationContext as Activity, applicationContext, "Work Manager works", "Time now ${currentDateAndTime}")
+            noti.triggerNotification(applicationContext, "Work Manager works", "Time now ${currentDateAndTime}")
     }
 }
