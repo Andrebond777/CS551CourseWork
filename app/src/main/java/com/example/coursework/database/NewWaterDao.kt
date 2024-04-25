@@ -11,6 +11,6 @@ interface NewWaterDao {
     @Upsert
     suspend fun upsertWaterTrigger(newWaterData: NewWaterData)
 
-    @Query("SELECT * FROM newWaterTable")
-    fun getWaterData(): Flow<List<NewWaterData>>
+    @Query("SELECT * FROM newWaterTable LIMIT 1")
+    fun getWaterData(): NewWaterData
 }

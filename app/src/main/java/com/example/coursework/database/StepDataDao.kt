@@ -30,6 +30,8 @@ interface StepDataDao {
     @Query("SELECT SUM(stepCount) AS totalSteps FROM steps GROUP BY strftime('%Y-%m-%d', dateAndTimeAdded / 1000, 'unixepoch')")
     fun getStepsEachDay(): List<Int>
 
+    @Query("SELECT dateAndTimeAdded FROM steps WHERE stepCount= :stepCount")
+    fun getDate(stepCount: Int): Long
 
     @Insert
     suspend fun addSteps(stepsData: StepsData)

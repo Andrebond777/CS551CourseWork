@@ -61,16 +61,15 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
 
-<<<<<<< HEAD
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
-=======
+
 fun getDate(daysAgo: Int): DayOfWeek? {
     val date = LocalDate.now().minusDays(daysAgo.toLong())
     return date.dayOfWeek;
 }
 
-@OptIn(ExperimentalFoundationApi::class)
->>>>>>> 407c0316ed145a91abd0129422b4a9214db514a8
+@OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
+
 @Composable
 fun MainScreen(
     viewModel: AppViewModel,
@@ -91,6 +90,9 @@ fun MainScreen(
 
     val waterGiven by viewModel.waterGiven.collectAsState()
     val key = remember { mutableStateOf(0) }
+
+    val isTrg by viewModel.isTrigger.collectAsState()
+    val dateToday by viewModel.dateToday.collectAsState()
 
     val dailyStepsProgress = stepsToday?.div(recommendedSteps.toFloat());
 
@@ -177,7 +179,7 @@ fun MainScreen(
 //    val what = stepsEveryDayOfWeek.maxOf { x -> x!! };
   
     // Water Drinking
-    viewModel.runWaterTrigger()
+    //viewModel.getNewWaterData()
 
 
     Column(
@@ -217,7 +219,7 @@ fun MainScreen(
 
             Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(
-                    text = "Today",
+                    text = "$dateToday",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -289,15 +291,17 @@ fun MainScreen(
 //                            "Week",
 //                            "$waterGiven"
 //                        )
-                              viewModel.addSteps(
-                                  StepsData(
-                                      stepCount = 10,
-                                      dateAndTimeAdded = System.currentTimeMillis()
-                                  )
-                              )
+//                              viewModel.addSteps(
+//                                  StepsData(
+//                                      stepCount = 10,
+//                                      dateAndTimeAdded = System.currentTimeMillis()
+//                                  )
+//                              )
+                        viewModel.getNewWaterData()
                     },
                     onLongClick = {
 
+                        viewModel.runWaterTrigger()
 //                        viewModel.setLastWaterDataToOne()
 //                        viewModel.getLastWaterDataSameDate()
 //                        viewModel.addMockDataWater()
@@ -307,9 +311,9 @@ fun MainScreen(
 //                                dateAndTimeAdded = System.currentTimeMillis()
 //                            )
 //                        )
-                        viewModel.addSteps(StepsData(stepCount = 10, System.currentTimeMillis() - ((7 * 24 * 60 * 60 * 1000))))
-                        viewModel.addSteps(StepsData(stepCount = 20, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
-                        viewModel.addSteps(StepsData(stepCount = 30, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
+//                        viewModel.addSteps(StepsData(stepCount = 10, System.currentTimeMillis() - ((7 * 24 * 60 * 60 * 1000))))
+//                        viewModel.addSteps(StepsData(stepCount = 20, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
+//                        viewModel.addSteps(StepsData(stepCount = 30, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
 
 //                        notificationWorker.triggerNotification(
 //                            context,

@@ -1,10 +1,6 @@
 package com.example.coursework.ui
 
-<<<<<<< HEAD
 import android.annotation.SuppressLint
-=======
-import android.Manifest
->>>>>>> 407c0316ed145a91abd0129422b4a9214db514a8
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -167,6 +163,10 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     private val _dateToday = MutableStateFlow<String?>("")
     val dateToday: StateFlow<String?> = _dateToday
 
+    private val _isTrigger = MutableStateFlow<String?>("")
+    val isTrigger: StateFlow<String?> = _isTrigger
+
+
     private val _dateYtd  = MutableStateFlow<String?>("")
     val dateYtd: StateFlow<String?> = _dateYtd
 
@@ -179,17 +179,18 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     fun getNewWaterData(){
         viewModelScope.launch(Dispatchers.IO) {
-            _dateToday.value = repository.getNewWaterData().toString()
+            val row = repository.getNewWaterData()
+            _dateToday.value = row.dateTrigger
         }
     }
-    @SuppressLint("NewApi")
+
     fun runWaterTrigger(){
 //        viewModelScope.launch(Dispatchers.IO) {
 //
 //        }
 
 
-        val newWaterData = repository.getNewWaterData()
+        //val newWaterData = repository.getNewWaterData()
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         val formattedDateToday = currentDate.format(formatter)

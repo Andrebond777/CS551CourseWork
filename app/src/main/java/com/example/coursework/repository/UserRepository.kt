@@ -61,7 +61,7 @@ class UserRepository(context: Context) {
     }
 
     // New Water Trigger - Get all data
-    fun getNewWaterData(): Flow<List<NewWaterData>>{
+    fun getNewWaterData(): NewWaterData {
         return newWaterDao.getWaterData()
     }
 
