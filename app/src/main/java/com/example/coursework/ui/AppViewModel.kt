@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.ListenableWorker
 import com.example.coursework.data.UiState
 import com.example.coursework.data.WeatherApi
 import com.example.coursework.data.WeatherData
@@ -166,84 +167,56 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     private val _isTrigger = MutableStateFlow<String?>("")
     val isTrigger: StateFlow<String?> = _isTrigger
 
-
-    private val _dateYtd  = MutableStateFlow<String?>("")
-    val dateYtd: StateFlow<String?> = _dateYtd
-
-    private val _dateCurrent  = MutableStateFlow<String?>("")
-    val dateCurrent: StateFlow<String?> = _dateCurrent
-
-    private val _isWaterTrigger = MutableStateFlow<Int?>(0)
-    val isWaterTrigger: StateFlow<Int?> = _isWaterTrigger
-
-
     fun getNewWaterData(){
         viewModelScope.launch(Dispatchers.IO) {
             val row = repository.getNewWaterData()
             _dateToday.value = row.dateTrigger
-        }
-    }
-
-    fun getT(){
-        viewModelScope.launch(Dispatchers.IO) {
-            val row = repository.getNewWaterData()
             _isTrigger.value = row.isTrigger.toString()
         }
     }
 
-    fun runWaterTrigger(){
-//        viewModelScope.launch(Dispatchers.IO) {
-//
-//        }
-
-
-        //val newWaterData = repository.getNewWaterData()
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun runWaterTrigger() {
         val currentDate = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-        val formattedDateToday = currentDate.format(formatter)
+        val formattedDateToday = currentDate.format(formatter).trim()
+
+        Thread.sleep(1000)
 
         // When first run, they are all empty value,
         // assign them the value
-        if(_dateToday.value == "" && _dateYtd.value == "" && _dateCurrent.value == ""){
-
-            val ytdDate = LocalDate.now().minusDays(1)
-            val formattedDateYtd = ytdDate.format(formatter)
-
-            _dateToday.value = formattedDateToday
-            _dateYtd.value = formattedDateYtd
-            _dateCurrent.value = formattedDateToday
-
+        if(_dateToday.value == ""){
             var newWaterData = NewWaterData(1, 0, formattedDateToday)
             viewModelScope.launch(Dispatchers.IO) {
                 repository.upsertNewWaterData(newWaterData)
             }
-
         }
+        val s1 = LocalDate.parse(_dateToday.value, formatter).atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
+        val s2 = LocalDate.parse(formattedDateToday, formatter).atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
 
-//         check variable _dateToday is same date as todays Date
-//         else update the date, and update the isWaterTrigger to 0
-        if(dateToday.value != formattedDateToday){
-            val ytdDate = LocalDate.now().minusDays(1)
-            val formattedDateYtd = ytdDate.format(formatter)
 
+        //check variable _dateToday is same date as todays Date
+         //else update the date, and update the isWaterTrigger to 0
+        if(s1 != s2){
             // Update the date from previous up-to-date
-            _dateToday.value = formattedDateToday
-            _dateYtd.value = formattedDateYtd
-            _dateCurrent.value = formattedDateToday
-            _isWaterTrigger.value = 0
+            var newWaterData = NewWaterData(1, 0, formattedDateToday)
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.upsertNewWaterData(newWaterData)
+            }
         }
 
-//         When the steps is over 2500 and has been trigger by today yet,
-//         trigger the notification
-        if(stepsToday.value!! > 1780 && isWaterTrigger.value != 1){
+         //When the steps is over 2500 and has been trigger by today yet,
+         //trigger the notification
+        if(stepsToday.value!! > 5 && _isTrigger.value == "0"){
             val notificationWorker = NotificationWorker()
             notificationWorker.triggerNotification(context, "Stay Hydrated", "Stay Healthy, Drink Water.")
-            _isWaterTrigger.value = 1
+            var newWaterData = NewWaterData(1, 1, formattedDateToday)
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.upsertNewWaterData(newWaterData)
+            }
         }
 
-//        return readAllData.toString()
-
-    }
+    } // end of runTrigger function
 
 
 

@@ -2,8 +2,10 @@ package com.example.coursework.ui
 
 import android.Manifest
 import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -68,6 +70,7 @@ fun getDate(daysAgo: Int): DayOfWeek? {
     return date.dayOfWeek;
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
 
 @Composable
@@ -164,15 +167,14 @@ fun MainScreen(
     //viewModel.testWeatherWatcherWorker()
 
     viewModel.runWeatherWatcherWorker()
+    viewModel.getNewWaterData()
+    viewModel.runWaterTrigger()
 
     val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
 //    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
 //    val maxStepsDay = stepsEveryDayOfWeek.indexOf(maxStepsCount);
 //    val what = stepsEveryDayOfWeek.maxOf { x -> x!! };
   
-    // Water Drinking
-    //viewModel.getNewWaterData()
-
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -211,7 +213,7 @@ fun MainScreen(
 
             Column (modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(
-                    text = "$isTrg",
+                    text = "Highlight",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -275,46 +277,14 @@ fun MainScreen(
                 .padding(horizontal = 20.dp)
                 .clip(RoundedCornerShape(20))
                 .background(colorResource(id = R.color.blue))
-                .combinedClickable(
-                    onClick = {
-
-//                        notificationWorker.triggerNotification(
-//                            context,
-//                            "Week",
-//                            "$waterGiven"
-//                        )
-//                              viewModel.addSteps(
-//                                  StepsData(
-//                                      stepCount = 10,
-//                                      dateAndTimeAdded = System.currentTimeMillis()
-//                                  )
-//                              )
-//                        viewModel.getNewWaterData()
-                              viewModel.getT()
-                    },
-                    onLongClick = {
-
-                        viewModel.runWaterTrigger()
-//                        viewModel.setLastWaterDataToOne()
-//                        viewModel.getLastWaterDataSameDate()
-//                        viewModel.addMockDataWater()
-//                        viewModel.addSteps(
-//                            StepsData(
-//                                stepCount = 3,
-//                                dateAndTimeAdded = System.currentTimeMillis()
-//                            )
-//                        )
-//                        viewModel.addSteps(StepsData(stepCount = 10, System.currentTimeMillis() - ((7 * 24 * 60 * 60 * 1000))))
-//                        viewModel.addSteps(StepsData(stepCount = 20, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
-//                        viewModel.addSteps(StepsData(stepCount = 30, System.currentTimeMillis() - ((8 * 24 * 60 * 60 * 1000))))
-
-//                        notificationWorker.triggerNotification(
-//                            context,
-//                            "Week",
-//                            "Changed to 1",
-//                        )
-                    }
-                )
+//                .combinedClickable(
+//                    onClick = {
+//                        viewModel.getT()
+//                    },
+//                    onLongClick = {
+//                        viewModel.runWaterTrigger()
+//                    }
+//                )
         ) {
 
             Row(
