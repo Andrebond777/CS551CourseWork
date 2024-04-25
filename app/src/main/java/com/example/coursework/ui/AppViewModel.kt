@@ -328,11 +328,6 @@ class AppViewModel(private val context: Context, private val repository: UserRep
 
     // room database function ends here -------->
 
-    //Use to Run GPS worker to fetch GPS location into
-    fun runGPSWorker(){
-        repository.runGPSWorker()
-    }
-
     // If todays water drinking is not been trigger
     // NOT BEEN TRIGGER VALUE SHOULD BE 0
     // AND
