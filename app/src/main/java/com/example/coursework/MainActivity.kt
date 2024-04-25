@@ -10,13 +10,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.coursework.database.AppDatabase
 import com.example.coursework.repository.UserRepository
 import com.example.coursework.ui.AppViewModel
 import com.example.coursework.ui.theme.CourseWorkTheme
+import com.example.coursework.worker.StepAnalysisWorker
 import com.example.coursework.worker.StepWorker
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     lateinit var appDatabase: AppDatabase // Declare AppDatabase instance
@@ -37,6 +41,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         setupStepWorker()
+        scheduleStepsActivityCheck()
     }
 
     private fun setupStepWorker() {
@@ -46,6 +51,14 @@ class MainActivity : ComponentActivity() {
         WorkManager.getInstance(this).enqueue(workRequest)
 
     }
+
+    private fun scheduleStepsActivityCheck() {
+        val workRequest = PeriodicWorkRequestBuilder<StepAnalysisWorker>(5, TimeUnit.HOURS)
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
 
 
     private fun createNotificationChannel() {

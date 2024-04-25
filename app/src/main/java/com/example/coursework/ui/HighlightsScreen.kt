@@ -106,13 +106,14 @@ fun HighlightsScreen(navHostController: NavHostController, viewModel: AppViewMod
         val maxRange = stepsEveryDayOfWeek.maxBy { x -> x!! }!!;
         val barData = arrayListOf<BarData>()
         for (index in 0 until  listSize) {
-            val point =  Point(index.toFloat(), stepsEveryDayOfWeek[index]!!.toFloat());
+            val point =  Point(index.toFloat(), stepsEveryDayOfWeek[index]!!.toFloat())
+            val cntr = index+1
             barData.add(
                 BarData(
                     point = point,
                     colorResource(id = R.color.blue),
                     dataCategoryOptions = DataCategoryOptions(),
-                    label = "Week$index",
+                    label = "Day $cntr",
                 )
             )
         }
