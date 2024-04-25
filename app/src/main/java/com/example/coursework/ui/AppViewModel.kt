@@ -46,6 +46,7 @@ class AppViewModel(private val context: Context, private val repository: UserRep
     private val _stepsWeek = MutableStateFlow<Int?>(0)
     var _stepsEveryDayWeek = mutableListOf<Int?>()
 
+
     val stepsWeek: StateFlow<Int?> = _stepsWeek
     //variable that fetches the output of the gps worker from the repository
     val location: Flow<DoubleArray> = repository.outputWorkInfo
@@ -189,6 +190,11 @@ class AppViewModel(private val context: Context, private val repository: UserRep
         viewModelScope.launch(Dispatchers.IO) {
             _stepsEveryDayWeek = repository.getStepsEveryDayLastSevenDays(sevenDaysAgo, todayEnd).toMutableList()
         }
+    }
+
+    public fun getDate(stepCount: Int): Long {
+            return repository.getDate(stepCount);
+
     }
 
 

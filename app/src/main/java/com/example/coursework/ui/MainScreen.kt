@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -41,20 +38,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.coursework.AppScreen
-import com.example.coursework.MainActivity
 import com.example.coursework.R
+import com.example.coursework.model.StepsData
 import com.example.coursework.ui.theme.CourseWorkTheme
 import com.example.coursework.worker.NotificationWorker
-import com.example.coursework.model.StepsData
-import com.example.coursework.repository.UserRepository
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.util.Date
 
+
+fun getDate(daysAgo: Int): DayOfWeek? {
+    val date = LocalDate.now().minusDays(daysAgo.toLong())
+    return date.dayOfWeek;
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -64,6 +66,8 @@ fun MainScreen(
     navHostController: NavHostController
 )
 {
+
+
     val uiState by viewModel.uiState.collectAsState()
     val dailyKCalProgress = uiState.dayKCal.toFloat() / uiState.dailyKCalIntake.toFloat()
 
@@ -98,6 +102,8 @@ fun MainScreen(
         viewModel.getStepsToday()
     }
 
+
+
     //GPS TESTING
     //Uncomment to get a notification containing latitude and longitude when opening application
 
@@ -112,6 +118,11 @@ fun MainScreen(
 
     viewModel.runWeatherWatcherWorker()
 
+    val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
+//    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
+//    val maxStepsDay = stepsEveryDayOfWeek.indexOf(maxStepsCount);
+//    val what = stepsEveryDayOfWeek.maxOf { x -> x!! };
+
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
@@ -121,50 +132,44 @@ fun MainScreen(
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
+                .padding(20.dp, 10.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
                 .align(alignment = Alignment.Start))
 
         {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
 
-                Box(contentAlignment = Alignment.Center) {
-                    if (dailyStepsProgress != null) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(90.dp),
-                            color = Color.White,
-                            progress = dailyStepsProgress,
-                            strokeWidth = 8.dp
-                        )
-                    }
-                    if (dailyStepsProgress != null) {
-                        Text(
-                            modifier = Modifier.padding(5.dp),
-                            text = "" + (dailyStepsProgress*100).toInt() +"%",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 25.sp
-                        )
-                    }
+            Box(contentAlignment = Alignment.Center) {
+                if (dailyStepsProgress != null) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(90.dp),
+                        color = Color.White,
+                        progress = dailyStepsProgress,
+                        strokeWidth = 8.dp
+                    )
                 }
-
-                Column (modifier = Modifier.padding(horizontal = 15.dp)) {
+                if (dailyStepsProgress != null) {
                     Text(
-                        text = "Great!",
+                        modifier = Modifier.padding(5.dp),
+                        text = "" + (dailyStepsProgress*100).toInt() +"%",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
-                        color = Color.LightGray,
-                        fontSize = 16.sp
+                        fontSize = 25.sp
                     )
                 }
+            }
 
+            Column (modifier = Modifier.padding(horizontal = 15.dp)) {
+                Text(
+                    text = "Today",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
+                    color = Color.LightGray,
+                    fontSize = 16.sp
+                )
             }
 
         }
@@ -188,18 +193,24 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
+                    var stepCount = 0;
+                    var date : DayOfWeek? = getDate(0);
+                    if(viewModel._stepsEveryDayWeek.size > 0)
+                    {
+                        stepCount = viewModel._stepsEveryDayWeek.maxByOrNull { x -> x!! }!!
+                        date = getDate(viewModel._stepsEveryDayWeek.size - 1 - viewModel._stepsEveryDayWeek.indexOf(stepCount));
+                    }
                     Text(
-                        text = "Highlights",
+                        text = "You made " + stepCount + " steps on " + date + "!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "You are walking this week ",
+                        text = "Tap to see more",
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
-
                 }
             }
 
