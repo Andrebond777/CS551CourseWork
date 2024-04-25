@@ -30,6 +30,8 @@ class UserRepository(context: Context) {
         AppDatabase::class.java, "user-database"
     ).build()
 
+
+
     // Get the User DAO
     private val userDao = db.userDao()
 
@@ -120,6 +122,13 @@ class UserRepository(context: Context) {
     // if not true, set true and return 1
     // if record does not exists, create a record and set value to true and return 1
     // sql error return -1
+
+    suspend fun addMockData() {
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (9 * 24 * 60 * 60 * 1000)))
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (8 * 24 * 60 * 60 * 1000)))
+        waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000)))
+    }
+
     suspend fun setLastWaterDataToOne() {
         val lastWaterData = getLastWaterData()
         // if no record exists with the current date
@@ -134,21 +143,14 @@ class UserRepository(context: Context) {
             }.timeInMillis
 
             // if data exists for the same date
-            if (isSameDay(lastWaterData.dateAndTimeOfNotification, currentDate)) {
+            if (!isSameDay(lastWaterData.dateAndTimeOfNotification, currentDate)) {
                 // if the last record is 0
-                if (lastWaterData.dateAndTimeOfNotification.equals(0)) {
-                    // change record to 1
-                    waterDao.updateWaterGiven(
-                        WaterData(
-                            lastWaterData.id,
-                            1,
-                            lastWaterData.dateAndTimeOfNotification
-                        )
-                    )
-                }
+                waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis()))
             }
         } else {
-            waterDao.insertWaterData(WaterData(waterNotificationGiven = 1))
+            // no previous data of same date found
+            // creating a new data record set to zero
+            waterDao.insertWaterData(WaterData(waterNotificationGiven = 1, dateAndTimeOfNotification = System.currentTimeMillis()))
         }
     }
 
