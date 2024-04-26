@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -173,11 +175,6 @@ fun MainScreen(
 //    viewModel.runWeatherWatcherWorker()
     viewModel.getNewWaterData()
     viewModel.runWaterTrigger()
-
-    val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
-//    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
-//    val maxStepsDay = stepsEveryDayOfWeek.indexOf(maxStepsCount);
-//    val what = stepsEveryDayOfWeek.maxOf { x -> x!! };
   
 
     Column(
@@ -185,53 +182,80 @@ fun MainScreen(
         modifier = modifier
     ) {
 
-        Button(onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
-            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
-            shape = RoundedCornerShape(20),
+        Spacer(modifier = Modifier.size(30.dp))
+        // Bryant - Start of weather box
+        Box(
             modifier = Modifier
-                .padding(20.dp, 10.dp)
                 .fillMaxWidth()
-                .align(alignment = Alignment.Start))
+                .height(90.dp)
+                .padding(horizontal = 20.dp)
+                .clip(RoundedCornerShape(20))
+                .background(Color.LightGray)
+        ) {
 
-        {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
 
-            Box(contentAlignment = Alignment.Center) {
-                if (dailyStepsProgress != null) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(90.dp),
-                        color = Color.White,
-                        progress = dailyStepsProgress,
-                        strokeWidth = 8.dp
-                    )
-                }
-                if (dailyStepsProgress != null) {
-                    Text(
-                        modifier = Modifier.padding(5.dp),
-                        text = "" + (dailyStepsProgress*100).toInt() +"%",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 25.sp
-                    )
-                }
-            }
+                    when (weatherState) {
+                        is WeatherState.Success -> {
+                            val weatherData = (weatherState as WeatherState.Success).weatherData
 
-            Column (modifier = Modifier.padding(horizontal = 15.dp)) {
-                Text(
-                    text = "Highlight",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
-                    color = Color.LightGray,
-                    fontSize = 16.sp
-                )
-            }
+                            Text(
+                                text = "${weatherData.location.name}, ${weatherData.location.country}",
+                                color = colorResource(id = R.color.blue),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
 
-        }
+                            Row(
+                                modifier = Modifier
+                            ){
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data("https://${weatherData.current.condition.icon.removePrefix("//")}")
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "${weatherData.current.condition.text}",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.clip(CircleShape)
+                                )
+                                Text(
+                                    text = "${weatherData.current.temp_c} °C , ${weatherData.current.condition.text}",
+                                    color = colorResource(id = R.color.blue),
+                                    fontSize = 16.sp
+                                )
+                            }
 
-        //Spacer(modifier = Modifier.size(7.dp))
+                        } // end of weather api load success
+
+                        is WeatherState.Loading -> {
+                            CircularProgressIndicator()
+                        } // end of weather is still loading
+
+                        is WeatherState.Error -> {
+                            Text(
+                                text = "Failed to fetch weather data.",
+                                color = colorResource(id = R.color.blue),
+                                fontSize = 16.sp
+                            )
+                        } // end of weather is failed to load
+
+                    } // end of when
+
+                } // end of Column
+
+            } // end of Row
+
+        } // end of weather box
+        Spacer(modifier = Modifier.size(20.dp))
+
+
 
 
         Button(onClick = { navHostController.navigate(AppScreen.Highlights.name) },
@@ -239,6 +263,7 @@ fun MainScreen(
             shape = RoundedCornerShape(20),
             modifier = Modifier
                 .padding(20.dp, 10.dp)
+                .height(110.dp)
                 .fillMaxWidth()
                 .align(alignment = Alignment.Start))
 
@@ -273,91 +298,63 @@ fun MainScreen(
 
         }
 
+        Spacer(modifier = Modifier.size(10.dp))
 
-        // Bryant - Start of weather box
-        Box(
+        Button(onClick = { navHostController.navigate(AppScreen.StepsProgress.name) },
+            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            shape = RoundedCornerShape(20),
             modifier = Modifier
+                .padding(20.dp, 10.dp)
+                .height(110.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .clip(RoundedCornerShape(20))
-                .background(colorResource(id = R.color.blue))
-//                .combinedClickable(
-//                    onClick = {
-//                        viewModel.getT()
-//                    },
-//                    onLongClick = {
-//                        viewModel.runWaterTrigger()
-//                    }
-//                )
-        ) {
+                .align(alignment = Alignment.Start))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
+        {
 
-                    when (weatherState) {
-                        is WeatherState.Success -> {
-                            val weatherData = (weatherState as WeatherState.Success).weatherData
+            Box(contentAlignment = Alignment.Center) {
+                if (dailyStepsProgress != null) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(90.dp),
+                        color = Color.White,
+                        progress = dailyStepsProgress,
+                        strokeWidth = 8.dp
+                    )
+                }
+                if (dailyStepsProgress != null) {
+                    Text(
+                        modifier = Modifier.padding(5.dp),
+                        text = "" + (dailyStepsProgress*100).toInt() +"%",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp
+                    )
+                }
+            }
 
-                            Text(
-                                text = "${weatherData.location.name}, ${weatherData.location.country}",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
-                            )
+            Column (modifier = Modifier.padding(horizontal = 15.dp)) {
+                Text(
+                    text = "Highlights",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = "You've walked ${stepsToday} steps out of your daily goal of $recommendedSteps!",
+                    color = Color.LightGray,
+                    fontSize = 16.sp
+                )
+            }
 
-                            Row(
-                                modifier = Modifier
-                            ){
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data("https://${weatherData.current.condition.icon.removePrefix("//")}")
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = "${weatherData.current.condition.text}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.clip(CircleShape)
-                                )
-                                Text(
-                                    text = "${weatherData.current.temp_c} °C , ${weatherData.current.condition.text}",
-                                    color = Color.LightGray,
-                                    fontSize = 16.sp
-                                )
-                            }
+        }
 
-                        } // end of weather api load success
-
-                        is WeatherState.Loading -> {
-                            CircularProgressIndicator()
-                        } // end of weather is still loading
-
-                        is WeatherState.Error -> {
-                            Text(
-                                text = "Failed to fetch weather data.",
-                                color = Color.LightGray,
-                                fontSize = 16.sp
-                            )
-                        } // end of weather is failed to load
-
-                    } // end of when
-
-                } // end of Column
-
-            } // end of Row
-
-        } // end of weather box
-
+        Spacer(modifier = Modifier.size(10.dp))
 
         Button(onClick = { navHostController.navigate(AppScreen.Tips.name) },
             colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
                 .padding(20.dp, 10.dp)
+                .height(110.dp)
                 .fillMaxWidth()
                 .align(alignment = Alignment.Start))
 
@@ -388,10 +385,11 @@ fun MainScreen(
 
 
         Button(onClick = { navHostController.navigate(AppScreen.EnterData.name) },
-            colors= ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blue) ),
+            colors= ButtonDefaults.buttonColors(containerColor = Color.LightGray ),
             shape = RoundedCornerShape(20),
             modifier = Modifier
                 .padding(22.dp)
+                .height(90.dp)
                 .fillMaxWidth()
                 .align(alignment = Alignment.CenterHorizontally))
 
@@ -401,11 +399,11 @@ fun MainScreen(
                 imageVector = Icons.Outlined.Create,
                 contentDescription = "icon",
                 modifier = Modifier.size(30.dp),
-                tint = Color.White
+                tint = colorResource(R.color.blue)
             )
 
             Text(text = "Enter your parameters",
-                color = colorResource(R.color.white),
+                color = colorResource(R.color.blue),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp)
         }
