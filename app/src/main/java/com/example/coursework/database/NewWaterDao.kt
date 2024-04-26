@@ -13,4 +13,7 @@ interface NewWaterDao {
 
     @Query("SELECT * FROM newWaterTable LIMIT 1")
     fun getWaterData(): NewWaterData
+
+    @Query("SELECT EXISTS(SELECT 1 FROM newWaterTable where idx = 1)")
+    fun newWaterDataExists(): Boolean
 }

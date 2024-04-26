@@ -60,6 +60,10 @@ class UserRepository(context: Context) {
         return newWaterDao.getWaterData()
     }
 
+    fun checkNewWaterData(): Boolean {
+        return newWaterDao.newWaterDataExists()
+    }
+
     suspend fun upsertNewWaterData(waterData: NewWaterData){
         newWaterDao.upsertWaterTrigger(waterData)
     }

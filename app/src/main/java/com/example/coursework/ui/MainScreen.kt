@@ -171,8 +171,8 @@ fun MainScreen(
     //viewModel.testWeatherWatcherWorker()
 
 //    viewModel.runWeatherWatcherWorker()
-//    viewModel.getNewWaterData()
-//    viewModel.runWaterTrigger()
+    viewModel.getNewWaterData()
+    viewModel.runWaterTrigger()
 
     val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
 //    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
