@@ -51,6 +51,7 @@ import co.yml.charts.ui.barchart.models.BarStyle
 import com.example.coursework.AppScreen
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
+import java.time.DayOfWeek
 import java.util.Date
 import kotlin.random.Random
 
@@ -83,16 +84,18 @@ fun HighlightsScreen(navHostController: NavHostController, viewModel: AppViewMod
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
+                    var stepCount = 0;
+                    var date : DayOfWeek? = getDate(0);
+                    if(viewModel._stepsEveryDayWeek.size > 0)
+                    {
+                        stepCount = viewModel._stepsEveryDayWeek.maxByOrNull { x -> x!! }!!
+                        date = getDate(viewModel._stepsEveryDayWeek.size - 1 - viewModel._stepsEveryDayWeek.indexOf(stepCount));
+                    }
                     Text(
-                        text = "Highlights",
+                        text = "You made " + stepCount + " steps on " + date + "!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
-                    )
-                    Text(
-                        text = "You are walking this week ",
-                        color = Color.LightGray,
-                        fontSize = 16.sp
                     )
                 }
             }
