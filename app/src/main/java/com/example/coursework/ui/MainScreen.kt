@@ -154,6 +154,10 @@ fun MainScreen(
         if (requiredPermissions.isNotEmpty()) {
             requestMultiplePermissionsLauncher.launch(requiredPermissions.toTypedArray())
         }
+
+        viewModel.getStepsLastSevenDays()
+        viewModel.getStepsEveryDayLastSevenDays()
+        viewModel.getStepsToday()
     }
 
     LaunchedEffect(key.value) {
@@ -166,9 +170,9 @@ fun MainScreen(
     //Runs the Weather Watcher worker for testing purposes
     //viewModel.testWeatherWatcherWorker()
 
-    viewModel.runWeatherWatcherWorker()
-    viewModel.getNewWaterData()
-    viewModel.runWaterTrigger()
+//    viewModel.runWeatherWatcherWorker()
+//    viewModel.getNewWaterData()
+//    viewModel.runWaterTrigger()
 
     val stepsEveryDayOfWeek = viewModel._stepsEveryDayWeek
 //    val maxStepsCount = stepsEveryDayOfWeek.maxBy { x -> x!! };
