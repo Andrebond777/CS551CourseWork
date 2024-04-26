@@ -205,9 +205,9 @@ class AppViewModel(private val context: Context, private val repository: UserRep
             }
         }
 
-         //When the steps is over 2500 and has been trigger by today yet,
+         //When the steps is over 1800 and has been trigger by today yet,
          //trigger the notification
-        if(stepsToday.value!! > 5 && _isTrigger.value == "0"){
+        if(stepsToday.value!! > 1800 && _isTrigger.value == "0"){
             val notificationWorker = NotificationWorker()
             notificationWorker.triggerNotification(context, "Stay Hydrated", "Stay Healthy, Drink Water.")
             var newWaterData = NewWaterData(1, 1, formattedDateToday)
