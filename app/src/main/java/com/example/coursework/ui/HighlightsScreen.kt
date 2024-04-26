@@ -51,6 +51,7 @@ import co.yml.charts.ui.barchart.models.BarStyle
 import com.example.coursework.AppScreen
 import com.example.coursework.R
 import com.example.coursework.ui.theme.CourseWorkTheme
+import java.time.DayOfWeek
 import java.util.Date
 import kotlin.random.Random
 
@@ -83,16 +84,18 @@ fun HighlightsScreen(navHostController: NavHostController, viewModel: AppViewMod
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
+                    var stepCount = 0;
+                    var date : DayOfWeek? = getDate(0);
+                    if(viewModel._stepsEveryDayWeek.size > 0)
+                    {
+                        stepCount = viewModel._stepsEveryDayWeek.maxByOrNull { x -> x!! }!!
+                        date = getDate(viewModel._stepsEveryDayWeek.size - 1 - viewModel._stepsEveryDayWeek.indexOf(stepCount));
+                    }
                     Text(
-                        text = "Highlights",
+                        text = "You made " + stepCount + " steps on " + date + "!",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
-                    )
-                    Text(
-                        text = "You are walking this week ",
-                        color = Color.LightGray,
-                        fontSize = 16.sp
                     )
                 }
             }
@@ -103,50 +106,54 @@ fun HighlightsScreen(navHostController: NavHostController, viewModel: AppViewMod
 
 
         val listSize = stepsEveryDayOfWeek.size;
-        val maxRange = stepsEveryDayOfWeek.maxBy { x -> x!! }!!;
-        val barData = arrayListOf<BarData>()
-        for (index in 0 until  listSize) {
-            val point =  Point(index.toFloat(), stepsEveryDayOfWeek[index]!!.toFloat())
-            val cntr = index+1
-            barData.add(
-                BarData(
-                    point = point,
-                    colorResource(id = R.color.blue),
-                    dataCategoryOptions = DataCategoryOptions(),
-                    label = "Day $cntr",
+        if(listSize > 0)
+        {
+            var maxRange = stepsEveryDayOfWeek.maxBy { x -> x!! }!!;
+            maxRange = Math.floor((maxRange/1000).toDouble()).toInt() + 1
+            val barData = arrayListOf<BarData>()
+            for (index in 0 until listSize) {
+                val point = Point(index.toFloat(), stepsEveryDayOfWeek[index]!!.toFloat())
+                val cntr = index + 1
+                barData.add(
+                    BarData(
+                        point = point,
+                        colorResource(id = R.color.blue),
+                        dataCategoryOptions = DataCategoryOptions(),
+                        label = "Day $cntr",
+                    )
                 )
+            }
+
+            val yStepSize = maxRange
+
+            val xAxisData = AxisData.Builder()
+                .axisStepSize(30.dp)
+                .steps(barData.size - 1)
+                .bottomPadding(40.dp)
+                .axisLabelAngle(20f)
+                .startDrawPadding(48.dp)
+                .labelData { index -> barData[index].label }
+                .build()
+            val yAxisData = AxisData.Builder()
+                .steps(yStepSize)
+                .labelAndAxisLinePadding(20.dp)
+                .axisOffset(20.dp)
+                .labelData { index -> (index * (maxRange.toDouble() / yStepSize.toDouble())).toInt().toString() + "k" }
+                .build()
+            val barChartData = BarChartData(
+                chartData = barData,
+                xAxisData = xAxisData,
+                yAxisData = yAxisData,
+                barStyle = BarStyle(
+                    paddingBetweenBars = 20.dp,
+                    barWidth = 25.dp
+                ),
+                showYAxis = true,
+                showXAxis = true,
+                horizontalExtraSpace = 10.dp,
             )
+            BarChart(modifier = Modifier.height(350.dp).padding(top = 20.dp), barChartData = barChartData)
         }
-
-        val yStepSize = 10
-
-        val xAxisData = AxisData.Builder()
-            .axisStepSize(30.dp)
-            .steps(barData.size - 1)
-            .bottomPadding(40.dp)
-            .axisLabelAngle(20f)
-            .startDrawPadding(48.dp)
-            .labelData { index -> barData[index].label }
-            .build()
-        val yAxisData = AxisData.Builder()
-            .steps(yStepSize)
-            .labelAndAxisLinePadding(20.dp)
-            .axisOffset(20.dp)
-            .labelData { index -> (index * (maxRange / yStepSize)).toString() }
-            .build()
-        val barChartData = BarChartData(
-            chartData = barData,
-            xAxisData = xAxisData,
-            yAxisData = yAxisData,
-            barStyle = BarStyle(
-                paddingBetweenBars = 20.dp,
-                barWidth = 25.dp
-            ),
-            showYAxis = true,
-            showXAxis = true,
-            horizontalExtraSpace = 10.dp,
-        )
-        BarChart(modifier = Modifier.height(350.dp), barChartData = barChartData)
     }
 }
 
