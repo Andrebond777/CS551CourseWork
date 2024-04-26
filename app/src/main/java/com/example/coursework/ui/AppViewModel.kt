@@ -197,24 +197,24 @@ class AppViewModel(private val context: Context, private val repository: UserRep
                 repository.upsertNewWaterData(newWaterData)
             }
         }
-//        if(_dateToday.value != null) {
-//            val s1 = LocalDate.parse(_dateToday.value, formatter).atStartOfDay()
-//                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
-//            val s2 = LocalDate.parse(formattedDateToday, formatter).atStartOfDay()
-//                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
+        if(_dateToday.value != null) {
+            val s1 = LocalDate.parse(_dateToday.value, formatter).atStartOfDay()
+                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
+            val s2 = LocalDate.parse(formattedDateToday, formatter).atStartOfDay()
+                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
 
         //check variable _dateToday is same date as todays Date
         //else update the date, and update the isWaterTrigger to 0
-//            if (s1 != s2) {
-        if(_dateToday.value != formattedDateToday) {
-            // Update the date from previous up-to-date
-            var newWaterData = NewWaterData(1, 0, formattedDateToday)
-            viewModelScope.launch(Dispatchers.IO) {
-                repository.upsertNewWaterData(newWaterData)
+            if (s1 != s2) {
+                //if(_dateToday.value != formattedDateToday) {
+                    // Update the date from previous up-to-date
+                    var newWaterData = NewWaterData(1, 0, formattedDateToday)
+                    viewModelScope.launch(Dispatchers.IO) {
+                        repository.upsertNewWaterData(newWaterData)
+                    }
+                //}
             }
         }
-//            }
-//        }
 
         //When the steps is over 1800 and has been trigger by today yet,
         //trigger the notification
